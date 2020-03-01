@@ -11,6 +11,7 @@ class App extends React.Component {
 		this.state = {
 			pagelists:[true,false,false,false],
 			maindata:[],
+			base_url:"http://localhost:51560/",
 			mainobject:{
 				Barcode:"",
 				Product_Name: "",
@@ -38,9 +39,10 @@ class App extends React.Component {
 
 		if(pagelists[1]) {
 
-			let url = `http://localhost:51560/Suppliers/Get/`;			
-			let response = await fetch(url);
-			let supplierobject = await response.json();
+			// let url =this.state.base_url + `Suppliers/Get/`;			
+			// let response = await fetch(url);
+			// let supplierobject = await response.json();
+			let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"}]
 			this.setState({
 				supplierobject
 			})
@@ -48,7 +50,7 @@ class App extends React.Component {
 		}
 		if(pagelists[2]) {
 
-			let url = `http://localhost:51560/Categories/Get/`;			
+			let url = this.state.base_url + `Categories/Get/`;			
 			let response = await fetch(url);
 			let categoryobject = await response.json();
 			this.setState({
@@ -59,7 +61,7 @@ class App extends React.Component {
 
 		if(pagelists[3]) {
 
-			let url = `http://localhost:51560/Products/GetProducts/`;			
+			let url = this.state.base_url + `Products/GetProducts/`;			
 			let response = await fetch(url);
 			let productobject = await response.json();
 			this.setState({
@@ -123,7 +125,7 @@ class App extends React.Component {
 		if(mainobject.Supplier_Name==="") {mainobject.Supplier_Name="null"}
 	
 		if(mainobject.BW_Name !==""){
-			let url = `http://localhost:51560/Search/Search/${JSON.stringify (mainobject)}`;
+			let url = this.state.base_url + `Search/Search/${JSON.stringify (mainobject)}`;
 			let settings = {
 				method: "POST",
 				headers: {
@@ -151,10 +153,7 @@ class App extends React.Component {
 				BW_Name_error:true
 			})
 		}
-		mainobject.Barcode = "";
-		mainobject.Category_Name = "";
-		mainobject.Product_Name = "";
-		mainobject.Supplier_Name = "";
+		
 
 		this.setState({
 			mainobject

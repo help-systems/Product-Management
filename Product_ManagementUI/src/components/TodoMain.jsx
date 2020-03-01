@@ -1,5 +1,7 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { FaFilter } from 'react-icons/fa';
+
 class TodoMain extends React.Component {
     render() {
         let i = 0;      
@@ -38,8 +40,11 @@ class TodoMain extends React.Component {
                             ""
                         
                     }
-                </div>
+                </div>                
                 <div id = "maininfo">
+                    <div>
+                        <FaFilter/>
+                    </div>
                     <input 
                         type = "text" 
                         value = {this.props.mainobject.Supplier_Name}
