@@ -36,18 +36,7 @@ class App extends React.Component {
 				pagelists[i] = true:
 				pagelists[i] = false			
 		}
-
-		if(pagelists[1]) {
-
-			// let url =this.state.base_url + `Suppliers/Get/`;			
-			// let response = await fetch(url);
-			// let supplierobject = await response.json();
-			let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"}]
-			this.setState({
-				supplierobject
-			})
-
-		}
+		
 		if(pagelists[2]) {
 
 			let url = this.state.base_url + `Categories/Get/`;			
