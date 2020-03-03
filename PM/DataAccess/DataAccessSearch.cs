@@ -10,7 +10,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
     public class DataAccessSearch
     {
         private const string _coneectionString
-            = @"Data Source=DESKTOP-6NUHAOM\DROSQL;Initial Catalog=Supermarket_DB;Integrated Security=True";
+            = @"Data Source=LAPTOP-746F832P;Initial Catalog=Supermarket_DB;Integrated Security=True";
 
         private SqlConnection _connnection;
 
