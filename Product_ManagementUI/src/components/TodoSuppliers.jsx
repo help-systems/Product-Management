@@ -12,10 +12,13 @@ class TodoSuppliers extends React.Component {
 		this.state = {		
             base_url:"http://localhost:51560/",	
             supplierobj:{},
+            is_searchsupplier:false,
             supplier:"",       
             modal3: false,
             is_delete:false,
+            is_edit:true,
             addsituation:false,
+            currentEditer:"",
             currentDeleter:"",
             is_repeatsupplier:false,
             currentEDitSupplier:{name:"",index:""},
@@ -23,13 +26,15 @@ class TodoSuppliers extends React.Component {
         };
         this.SupplierSearch = this.SupplierSearch.bind(this);
         this.handleSupplierChange = this.handleSupplierChange.bind(this);
+        this.saveChange = this.saveChange.bind(this);
     }
 
     componentDidMount() {
-        // let url =this.state.base_url + `Suppliers/Get/`;			
-        // let response = await fetch(url);
-        // let supplierobject = await response.json();
-        let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
+
+        let url =this.state.base_url + `Suppliers/Get/`;			
+        let response = await fetch(url);
+        let supplierobject = await response.json();
+        // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
         let i = 1;
         supplierobject.map(item => {
             item.edit = false;
@@ -51,26 +56,15 @@ class TodoSuppliers extends React.Component {
     
     handleSupplierChange (index,e) {
 
-        console.log(e.target.value)
-        let newname = e.target.value;
-        let supplierobject =  this.state.supplierobject;
         let is_repeatsupplier = this.state.is_repeatsupplier;
-
-        supplierobject.map(item=>{
-            if(item.index !== index) {
-                return item;      
-                // if(newname === item.company_Name){
-                //     is_repeatsupplier = true;
-                // }  
-            }    
-            item.company_Name = newname;
-                      
-            return item;
-        });
-
         this.setState({
-            supplierobject,
-            is_repeatsupplier
+            currentEditer:e.target.value
+        })
+    }
+
+    handleSupplierChangeSingle(e){
+        this.setState({
+            currentEditer:e.target.value
         })
     }
 
@@ -80,10 +74,12 @@ class TodoSuppliers extends React.Component {
         let response = await fetch(url);
         let supplierobj = await response.json();
         console.log(supplierobj);
+        supplierobj.edit = false;
 
-        // this.setState({
-        // 	supplierobj
-        // })		
+        this.setState({
+            supplierobj,
+            is_searchsupplier:true
+        })		
     }
 
     todoSave(index,e) {
@@ -97,7 +93,19 @@ class TodoSuppliers extends React.Component {
         })
         this.setState({
             supplierobject,
-            modal3: !this.state.modal3
+            modal3: !this.state.modal3,
+            is_edit:true
+        });
+    }
+
+    todoSaveSingle = (e) => {
+        let supplierobj = this.state.supplierobj;
+        supplierobj.edit = !supplierobj.edit
+       
+        this.setState({
+            supplierobj,
+            modal3: !this.state.modal3,
+            is_edit:true
         });
     }
 
@@ -115,11 +123,26 @@ class TodoSuppliers extends React.Component {
         })
         this.setState({
             supplierobject,
-            currentEDitSupplier
+            currentEDitSupplier,
+            currentEditer:company
             
         });
     }
     
+    todoEditSingle= (company) => {
+        
+        let supplierobj = this.state.supplierobj;
+        supplierobj.edit = !supplierobj.edit;
+        let currentEDitSupplier  = {name:company,index:""};
+     
+        this.setState({
+            supplierobj,
+            currentEDitSupplier,
+            currentEditer:company
+            
+        });
+    }
+
     todoDelete = (name) => {
         this.setState({
             modal3: !this.state.modal3,
@@ -128,7 +151,15 @@ class TodoSuppliers extends React.Component {
           });
     }
 
-    cancelChange = (e) =>{
+    todoDeleteSingle = (name) => {
+        this.setState({
+            modal3: !this.state.modal3,
+            is_delete:true,
+            currentDeleter:name
+          });
+    }
+
+    cancelChange = () =>{
         let supplierobject = this.state.supplierobject;
         let currentEDitSupplier = this.state.currentEDitSupplier;
 
@@ -146,37 +177,95 @@ class TodoSuppliers extends React.Component {
             is_delete:false
         });
     }
+
+    cancelChangeSingle = () =>{
+
+        let supplierobj = this.state.supplierobj;
+        let currentEDitSupplier = this.state.currentEDitSupplier;
+        supplierobj.company_Name = currentEDitSupplier.name;
+        
+        currentEDitSupplier = {name:"",index:""};
+        this.setState({
+            supplierobj,
+            modal3: !this.state.modal3,
+            currentEDitSupplier,
+            is_delete:false
+        });
+    }
     
-    saveChange = () => {
+   async saveChange() {
 
         if(this.state.is_delete){
-            let supplierobject = this.state.supplierobject;
-            supplierobject =  supplierobject.filter(item => {
-                if (item.company_Name !== this.state.currentDeleter) {
-                    console.log(item.company_Name,"   ",this.state.currentDeleter)
-                    return item;
-                }
-            })
+            // let supplierobject = this.state.supplierobject;
+            let currentDeleter = this.state.currentDeleter;
+
+            let url = this.state.base_url + `Search/Search/${currentDeleter}`;
+			let settings = {
+				method: "Delete",
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Credentials': true,
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+					'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
+				},
+				body: `${currentDeleter}`
+			};
+			
+            let response = await fetch(url,settings);
+            
+            // supplierobject =  supplierobject.filter(item => {
+            //     if (item.company_Name !== this.state.currentDeleter) {
+            //         console.log(item.company_Name,"   ",this.state.currentDeleter)
+            //         return item;
+            //     }
+            // })
             this.setState({
                 is_delete:false,
-                currentDeleter:"",
-                supplierobject
+                currentDeleter:""
             });
+        }else if(this.state.is_edit) {
+            let new_name = this.state.currentEditer;
+            let company_Name = this.state.currentEDitSupplier.name;
+
+            let url = this.state.base_url + `Search/Search/${new_name}`;
+			let settings = {
+				method: "PUT",
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Credentials': true,
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+					'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
+				},
+				body: `${new_name}`
+			};
+			
+            let response = await fetch(url,settings);
+
         }
+
         let supplierobject = this.state.supplierobject;
         supplierobject.map(item => {
             if(item.index !== this.state.currentEDitSupplier.index){
-                return item;                
+                return item;
             }
-            if(item.company_Name.trim() === ""){
+            if(this.state.currentEditer.trim() === ""){
                 item.company_Name = this.state.currentEDitSupplier.name;
-            }
+            }else {
+                item.company_Name = this.state.currentEditer;
+            }           
             return item;
         })
 
         this.setState({
             modal3: !this.state.modal3,
-            supplierobject
+            supplierobject,
+            is_edit:false
         });
     }
 
@@ -206,7 +295,6 @@ class TodoSuppliers extends React.Component {
                     <button onClick = {this.SupplierSearch}>Search</button>
                 </div>
                 <div id="table" className="table-editable">
-
                     {
                         this.state.addsituation ?
                         <div>
@@ -230,14 +318,121 @@ class TodoSuppliers extends React.Component {
                         </div>
                         :
                         <span className="table-add float-right mb-3 mr-2">
-                            <a href="#!" className="text-success">
+                            <a href="#" className="text-success">
                             <FaPlus onClick = {this.todoAdd}/>
                             </a>
                          </span>
 
                     }
                     
-                {this.state.supplierobject.length > 0 ?
+                    {
+                        this.state.is_searchsupplier ?
+
+                        <table className="table table-bordered table-responsive-md table-striped text-center">
+                                
+                            <thead>
+                                <tr>
+                                    <th className="text-center">#</th>
+                                    <th className="text-center">Supplier Name</th>
+                                    <th className="text-center">Edit</th>
+                                    <th className="text-center">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody className = "mainlisthov">
+                        {
+                            <tr>
+                                <td>
+                                    #
+                                </td>
+                                {
+                                    !this.state.supplierobj.edit ? 
+                                    <td className="pt-3-half">
+                                        {this.state.supplierobj.company_Name}
+                                    </td> 
+                                    :
+                                    <td className="pt-3-half" >
+                                        {
+                                            this.state.is_repeatsupplier ?
+                                            <input 
+                                                type="text" 
+                                                value =  {this.state.currentEditer} 
+                                                className="editedSuppier repeatsupp" 
+                                                onChange = {(e) => {this.handleSupplierChangeSingle(e)}}  
+
+                                            />
+                                        :
+                                            <input 
+                                                type="text" 
+                                                value =  {this.state.currentEditer} 
+                                                className="editedSuppier" 
+                                                onChange = {(e) => {this.handleSupplierChangeSingle(e)}}  
+                                                />
+                                        }
+                                        
+                                    </td>
+                                }
+                                {
+                                    !this.state.supplierobj.edit ? 
+                                    <td>
+                                        <MDBBtn  color="primary" onClick ={(e) => {this.todoEditSingle(this.state.supplierobj.company_Name)}} >
+                                            <FaEdit className="editicon"/>
+                                            Edit</MDBBtn>
+                                    </td>
+                                    :
+                                    <td>
+                                        <MDBBtn 
+                                        color="primary" 
+                                        onClick={(e) => {this.todoSaveSingle(e)}}
+                                        >
+                                            Save
+                                        </MDBBtn>
+                                    </td>
+                                }
+                                <td>
+                                    <MDBContainer>
+                                        <MDBBtn  
+                                            className = "deletebutton"
+                                            color="primary" 
+                                            onClick={(e)=>{
+                                                this.todoDeleteSingle(this.state.supplierobj.company_Name);
+                                            }}
+                                        >
+                                            <MdDeleteForever className = "deleteicon"/>
+                                            Delete
+                                        </MDBBtn>
+                                        <MDBModal isOpen={this.state.modal3} toggle={this.toggle(3)} size="sm">
+                                            <MDBModalHeader toggle={this.toggle(3)}>Are you sure?</MDBModalHeader>
+                                            <MDBModalBody>
+                                            </MDBModalBody>
+                                            <MDBModalFooter>
+                                                <MDBBtn 
+                                                    color="secondary" 
+                                                    size="sm" 
+                                                    onClick={() => {
+                                                        this.cancelChangeSingle();                                                                
+                                                    }}
+                                                >
+                                                    Close
+                                                </MDBBtn>
+                                                <MDBBtn 
+                                                    color="primary" 
+                                                    size="sm" 
+                                                    onClick={this.saveChange}
+                                                >
+                                                    Save Changes
+                                                </MDBBtn>
+                                            </MDBModalFooter>
+                                        </MDBModal>
+                                    </MDBContainer>
+                                </td>
+                            </tr>
+                            
+                        }
+                        </tbody>
+                        </table>
+                            :
+                    
+                        this.state.supplierobject.length > 0 ?
                            <table className="table table-bordered table-responsive-md table-striped text-center">
                                 
                             <thead>
@@ -268,7 +463,7 @@ class TodoSuppliers extends React.Component {
                                                        this.state.is_repeatsupplier ?
                                                         <input 
                                                             type="text" 
-                                                            value =  {item.company_Name} 
+                                                            value =  {this.state.currentEditer} 
                                                             className="editedSuppier repeatsupp" 
                                                             onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
 
@@ -276,7 +471,7 @@ class TodoSuppliers extends React.Component {
                                                    :
                                                         <input 
                                                             type="text" 
-                                                            value =  {item.company_Name} 
+                                                            value =  {this.state.currentEditer} 
                                                             className="editedSuppier" 
                                                             onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
                                                          />
@@ -322,7 +517,7 @@ class TodoSuppliers extends React.Component {
                                                                 color="secondary" 
                                                                 size="sm" 
                                                                 onClick={() => {
-                                                                    this.cancelChange(true);                                                                
+                                                                    this.cancelChange();                                                                
                                                                 }}
                                                             >
                                                                 Close
@@ -347,7 +542,7 @@ class TodoSuppliers extends React.Component {
                             : 
                             <div>
                             </div>
-                            }
+                        }
                            
                 </div>
             </div>
