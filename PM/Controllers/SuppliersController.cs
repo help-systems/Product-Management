@@ -88,13 +88,13 @@ namespace PRODUCT_MANAGEMENT.Controllers
             return Ok();
         }
          
-         [HttpPut]
+        [HttpPut]
         public ActionResult Update([FromBody] Suppliers suppliers, string s1, string s2 )
         {
             try
             {
                 DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
-                
+               
             } 
             catch(Exception ex)
             {
