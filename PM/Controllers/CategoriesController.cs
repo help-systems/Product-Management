@@ -12,57 +12,74 @@ using PRODUCT_MANAGEMENT.DataAccess;
 namespace PRODUCT_MANAGEMENT.Controllers
 {
     [ApiController]
-    [Route("[controller]/[Action]")]
+    [Route("[controller]")]
 
     public class CategoriesController : ControllerBase
-    {
-        
+    {       
         private readonly ILogger<ProductsController> _logger;
+        private readonly DataAccessCategories Data = new DataAccessCategories();
 
         public CategoriesController(ILogger<ProductsController> logger)
         {
             _logger = logger;
         }
         
-         [HttpGet]
-         public IEnumerable<Categories> Get()
-         {
-            DataAccessCategories DataAccessCategories = new DataAccessCategories();
-            List<Categories> categories = DataAccessCategories.GetCategoriersAsGenericList();
-            return categories;
-         }
-         [HttpGet("{category_name}")]
-            public ActionResult<Categories> GetByName(string category_name)
-          {
-            DataAccessCategories DataAccessCategories = new DataAccessCategories();
-           var categories = DataAccessCategories.GetCategoriersAsGenericList().Where(x => x.Category_Name == category_name);
+        [HttpGet]
+        public IActionResult Get()
+        {
+            try
+            {
+                var result = Data.GetCategoriers();
 
-            if (categories== null) 
-            return NotFound();
-            return Ok(categories);
-            
-         }
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpGet("{category_name}")]
+        public IActionResult Get (string category_name)
+        {
+            try
+            {
+                var result = Data.GetCategoriers().Where(x => x.Category_Name == category_name).ToList();
+
+                if (result.Count() == 0)
+                    return NotFound();
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
         [HttpPost]
-        public ActionResult PostCategory(Categories category)
+        public ActionResult Post (Categories category)
         {
             try
             {
-                DataAccessCategories DataAccessCategories = new DataAccessCategories();
-                DataAccessCategories.InsertCategories(category);
+                Data.InsertCategories(category);
+
+                return Ok();
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
-            return Ok();
         }
+
+           
         [HttpDelete("{category_name}")]
-        public ActionResult Delete(string category_name)
+        public ActionResult Delete (string category_name)
         {
             try
             {
-               DataAccessCategories DataAccessCategories = new DataAccessCategories();
-                DataAccessCategories.DeleteCategories(category_name);
+                Data.DeleteCategories(category_name);
             }
             catch(Exception ex)
             {
@@ -70,8 +87,5 @@ namespace PRODUCT_MANAGEMENT.Controllers
             }
             return Ok();
         }
-
-     
-
     }
 }

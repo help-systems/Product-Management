@@ -14,7 +14,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         private int rowsAffected { get; set; }
         public string ResultText { get; set; }
 
-         public List<Suppliers> GetSuppliersAsGenericList()
+        public List<Suppliers> GetSuppliers ()
         {
             rowsAffected = 0;
             List<Suppliers> suppliers = new List<Suppliers>();
@@ -48,7 +48,6 @@ namespace PRODUCT_MANAGEMENT.DataAccess
 
             return suppliers;
         }
-
         
 
         public void InsertSuppliers(Suppliers suppliers)
@@ -75,7 +74,36 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                 ResultText = ex.ToString();
             }
         }
-         public void DeleteSuppliers(string company_name)
+
+
+        public Suppliers UpdateSupplier (Suppliers old_name, Suppliers new_name)
+        {
+            string sql = string.Format("EXEC PutSupplier '{0}','{1}'", old_name.Company_Name, new_name.Company_Name);
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(AppSettings.ConnectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(sql, cnn))
+                    {
+                        cnn.Open();
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                return old_name;
+            }
+            catch(Exception ex)
+            {
+                throw (ex);
+            }
+        }
+<<<<<<< HEAD
+=======
+
+
+        public void DeleteSuppliers(string company_name)
         {
             string sql="DELETE FROM [Suppliers] WHERE Company_Name = '{0}'";
             StringBuilder errorMessages = new StringBuilder();
@@ -101,8 +129,8 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                         Console.WriteLine(errorMessages.ToString());
                     }
                 }
-            }
-            
+            }           
         }
+>>>>>>> upstream/master
     }
 }
