@@ -1,5 +1,9 @@
 import React from "react";
-import { MDBContainer, MDBBtn, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter } from 'mdbreact';
+import { MDBContainer, MDBBtn, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter} from 'mdbreact';
+import { FaPlus } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
+import { MdDeleteForever} from "react-icons/md";
+
 import 'mdbreact/dist/css/mdb.css';
 
 class TodoSuppliers extends React.Component {
@@ -10,10 +14,10 @@ class TodoSuppliers extends React.Component {
             supplierobj:{},
             supplier:"",       
             modal3: false,
-            // change:false,
             is_delete:false,
-            is_change:false,
+            addsituation:false,
             currentDeleter:"",
+            is_repeatsupplier:false,
             currentEDitSupplier:{name:"",index:""},
             supplierobject:[]
         };
@@ -46,14 +50,20 @@ class TodoSuppliers extends React.Component {
     } 
     
     handleSupplierChange (index,e) {
+
         console.log(e.target.value)
         let newname = e.target.value;
         let supplierobject =  this.state.supplierobject;
+        let is_repeatsupplier = this.state.is_repeatsupplier;
 
         supplierobject.map(item=>{
-            if(item.index === index) {
-                item.company_Name = newname;
+            if(item.index !== index) {
+                return item;                
             }    
+            item.company_Name = newname;
+            if(newname === item.company_Name){
+                is_repeatsupplier = true;
+            }            
             return item;
         });
 
@@ -74,11 +84,11 @@ class TodoSuppliers extends React.Component {
         // })		
     }
 
-    todoSave(company,e) {
+    todoSave(index,e) {
 
         let supplierobject = this.state.supplierobject;
         supplierobject.map(item => {
-          if(item.company_Name === company){
+          if(item.index === index){
               item.edit = !item.edit;
           }
             return item;
@@ -101,11 +111,9 @@ class TodoSuppliers extends React.Component {
           }
             return item;
         })
-        // console.log(e,"jhnnnnn")
         this.setState({
             supplierobject,
-            currentEDitSupplier,
-            is_change:false
+            currentEDitSupplier
             
         });
     }
@@ -141,23 +149,40 @@ class TodoSuppliers extends React.Component {
 
         if(this.state.is_delete){
             let supplierobject = this.state.supplierobject;
-            supplierobject.filter(item => {
+            supplierobject =  supplierobject.filter(item => {
                 if (item.company_Name !== this.state.currentDeleter) {
                     console.log(item.company_Name,"   ",this.state.currentDeleter)
                     return item;
                 }
             })
-            console.log(supplierobject)
             this.setState({
                 is_delete:false,
                 currentDeleter:"",
                 supplierobject
             });
         }
+        let supplierobject = this.state.supplierobject;
+        supplierobject.map(item => {
+            if(item.index !== this.state.currentEDitSupplier.index){
+                return item;                
+            }
+            if(item.company_Name.trim() === ""){
+                item.company_Name = this.state.currentEDitSupplier.name;
+            }
+            return item;
+        })
+
         this.setState({
             modal3: !this.state.modal3,
-            is_change:true
+            supplierobject
         });
+    }
+
+    todoAdd = ()=> {
+        console.log("Hiiiiii")
+        this.setState({
+            addsituation:true
+        })
     }
 
     toggle = e => () => {
@@ -169,7 +194,7 @@ class TodoSuppliers extends React.Component {
     
     render() {
         return(
-            <div id="main">
+            <div id="main" className="card-body card">
                 <div className = "search" id = "maininfo">
                     <input 
                         type="text" 
@@ -178,9 +203,41 @@ class TodoSuppliers extends React.Component {
                         />
                     <button onClick = {this.SupplierSearch}>Search</button>
                 </div>
-                <div>
+                <div id="table" className="table-editable">
+
+                    {
+                        this.state.addsituation ?
+                        <div>
+                        <table className="table table-bordered table-responsive-md table-striped text-center">
+                            <thead>
+                                <tr>
+                                    <th className="text-center">New Supplier Name</th>
+                                </tr>
+                            </thead>
+                            <tbody className = "mainlisthov">
+                                <tr>
+                                    <td>
+                                        <input type="text"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <button>ADD</button>
+                        </div>
+                        </div>
+                        :
+                        <span className="table-add float-right mb-3 mr-2">
+                            <a href="#!" className="text-success">
+                            <FaPlus onClick = {this.todoAdd}/>
+                            </a>
+                         </span>
+
+                    }
+                    
                 {this.state.supplierobject.length > 0 ?
                            <table className="table table-bordered table-responsive-md table-striped text-center">
+                                
                             <thead>
                                 <tr>
                                     <th className="text-center">#</th>
@@ -205,25 +262,38 @@ class TodoSuppliers extends React.Component {
                                                 </td> 
                                                 :
                                                 <td className="pt-3-half" >
+                                                   {
+                                                       this.state.is_repeatsupplier ?
+                                                        <input 
+                                                            type="text" 
+                                                            value =  {item.company_Name} 
+                                                            className="editedSuppier repeatsupp" 
+                                                            onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
+
+                                                        />
+                                                   :
+                                                        <input 
+                                                            type="text" 
+                                                            value =  {item.company_Name} 
+                                                            className="editedSuppier" 
+                                                            onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
+                                                         />
+                                                   }
                                                    
-                                                    <input 
-                                                        type="text" 
-                                                        value =  {item.company_Name} 
-                                                        className="editedSuppier" 
-                                                        onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
-                                                    />
                                                 </td>
                                             }
                                             {
                                                 !item.edit ? 
                                                 <td>
-                                                    <MDBBtn  color="primary" onClick ={(e) => {this.todoEdit(item.company_Name)}} >Edit</MDBBtn>
+                                                    <MDBBtn  color="primary" onClick ={(e) => {this.todoEdit(item.company_Name)}} >
+                                                        <FaEdit className="editicon"/>
+                                                        Edit</MDBBtn>
                                                 </td>
                                                 :
                                                 <td>
                                                     <MDBBtn 
                                                     color="primary" 
-                                                    onClick={(e) => {this.todoSave(item.company_Name,e)}}
+                                                    onClick={(e) => {this.todoSave(item.index,e)}}
                                                     >
                                                         Save
                                                     </MDBBtn>
@@ -231,12 +301,14 @@ class TodoSuppliers extends React.Component {
                                             }
                                             <td>
                                                 <MDBContainer>
-                                                    <MDBBtn 
+                                                    <MDBBtn  
+                                                        className = "deletebutton"
                                                         color="primary" 
                                                         onClick={(e)=>{
                                                             this.todoDelete(item.company_Name);
                                                         }}
                                                     >
+                                                        <MdDeleteForever className = "deleteicon"/>
                                                         Delete
                                                     </MDBBtn>
                                                     <MDBModal isOpen={this.state.modal3} toggle={this.toggle(3)} size="sm">
@@ -244,22 +316,22 @@ class TodoSuppliers extends React.Component {
                                                         <MDBModalBody>
                                                         </MDBModalBody>
                                                         <MDBModalFooter>
-                                                        <MDBBtn 
-                                                            color="secondary" 
-                                                            size="sm" 
-                                                            onClick={() => {
-                                                                this.cancelChange(true);                                                                
-                                                            }}
-                                                        >
-                                                            Close
-                                                        </MDBBtn>
-                                                        <MDBBtn 
-                                                            color="primary" 
-                                                            size="sm" 
-                                                            onClick={this.saveChange}
-                                                        >
-                                                            Save Changes
-                                                        </MDBBtn>
+                                                            <MDBBtn 
+                                                                color="secondary" 
+                                                                size="sm" 
+                                                                onClick={() => {
+                                                                    this.cancelChange(true);                                                                
+                                                                }}
+                                                            >
+                                                                Close
+                                                            </MDBBtn>
+                                                            <MDBBtn 
+                                                                color="primary" 
+                                                                size="sm" 
+                                                                onClick={this.saveChange}
+                                                            >
+                                                                Save Changes
+                                                            </MDBBtn>
                                                         </MDBModalFooter>
                                                     </MDBModal>
                                                 </MDBContainer>
@@ -274,6 +346,7 @@ class TodoSuppliers extends React.Component {
                             <div>
                             </div>
                             }
+                           
                 </div>
             </div>
         );

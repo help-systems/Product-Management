@@ -103,10 +103,10 @@ body {
     background: #2980b9;
     color:white;
 }
-
+/* 
 .mainlisthov tr:hover{
     background: #32628b;
-}
+} */
 
 .table.table-dark  th{
     vertical-align: middle !important;
@@ -135,4 +135,24 @@ padding-right: 13px;
 }
 .editedSuppier {
     border:none;
+}
+.pt-3-half {
+    padding-top: 1.4rem;
+}
+.text-success {
+    font-size: 26px !important;
+}
+.editicon {
+    font-size: 18px;
+    padding: 0 3px 3px 0;
+}
+.deleteicon {
+    font-size: 19px;
+    padding: 0 3px 3px 0;
+}
+.deletebutton {
+    background: #c75858 !important;
+}
+.repeatsupp{
+    border: 1px solid red;
 }
