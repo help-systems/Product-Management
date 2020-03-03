@@ -11,7 +11,14 @@ namespace PRODUCT_MANAGEMENT.DataAccess
 {
     public class DataAccessPIB
     {
+<<<<<<< HEAD
+        private int rowsAffected { get; set; }
+        public string ResultText { get; set; }
+
+        public List<ProductsInBranches> GetProductsInBranchesList()
+=======
         public class DataAccessCategories
+>>>>>>> upstream/master
         {
             private int rowsAffected { get; set; }
             public string ResultText { get; set; }
@@ -50,5 +57,35 @@ namespace PRODUCT_MANAGEMENT.DataAccess
             }
 
         }
+<<<<<<< HEAD
+        public void InsertIntoBranch(ProductsInBranches pib)
+        {
+            rowsAffected = 0;
+            string sql = "INSERT INTO [Categories](Parent_Category,Category_Name )";
+            sql += $" VALUES( '{pib.Product_code}','{pib.Branch_name}', '{pib.Quantity}')";
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(AppSettings.ConnectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(sql, cnn))
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cnn.Open();
+                        rowsAffected = cmd.ExecuteNonQuery();
+
+                        ResultText = "Rows Affected: " + rowsAffected.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ResultText = ex.ToString();
+            }
+        }
     }
 }
+=======
+    }
+}
+>>>>>>> upstream/master

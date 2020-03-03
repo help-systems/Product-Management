@@ -89,6 +89,22 @@ namespace PRODUCT_MANAGEMENT.Controllers
                 return BadRequest(ex);
             }
         }
+         
+        [HttpPut]
+        public ActionResult Update([FromBody] Suppliers suppliers, string s1, string s2 )
+        {
+            try
+            {
+                DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
+                return Ok();
+            } 
+            catch(Exception ex)
+           {
+               return BadRequest(ex);
+           }
+         
+        }
+
 
 
         [HttpDelete]

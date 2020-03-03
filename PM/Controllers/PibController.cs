@@ -69,9 +69,5 @@ namespace AdonetCrud.Controllers
             }
             return Ok();
         }
-
-     
-
-    
     }
 }

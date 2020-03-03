@@ -18,8 +18,6 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         {
             rowsAffected = 0;
             List<Suppliers> suppliers = new List<Suppliers>();
-              
-
             DataTable dt = null;
 
             string sql = "SELECT Company_Name FROM Suppliers";
@@ -37,7 +35,6 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                             suppliers= (from row in dt.AsEnumerable()
                                         select new Suppliers
                                         {
-
                                             Company_Name = row.Field<string>("Company_Name")
                                         }).ToList();
 
@@ -56,8 +53,6 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         public void InsertSuppliers(Suppliers suppliers)
         {
             rowsAffected = 0;
-
-            // Create SQL statement to submit
             string sql = "INSERT INTO [Suppliers]( Company_Name)";
             sql += $" VALUES(  '{suppliers.Company_Name}')";
 
@@ -65,16 +60,11 @@ namespace PRODUCT_MANAGEMENT.DataAccess
             {
                 using (SqlConnection cnn = new SqlConnection(AppSettings.ConnectionString))
                 {
-                    // Create command object in using block for automatic disposal
                     using (SqlCommand cmd = new SqlCommand(sql, cnn))
                     {
-                        // Set CommandType
                         cmd.CommandType = CommandType.Text;
-                        // Open the connection
                         cnn.Open();
-                        // Execute the INSERT statement
                         rowsAffected = cmd.ExecuteNonQuery();
-
                         ResultText = "Rows Affected: " + rowsAffected.ToString();
                     }
                 }
@@ -109,6 +99,8 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                 throw (ex);
             }
         }
+<<<<<<< HEAD
+=======
 
 
         public void DeleteSuppliers(string company_name)
@@ -139,5 +131,6 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                 }
             }           
         }
+>>>>>>> upstream/master
     }
 }
