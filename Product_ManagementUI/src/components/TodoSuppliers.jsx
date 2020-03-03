@@ -58,17 +58,19 @@ class TodoSuppliers extends React.Component {
 
         supplierobject.map(item=>{
             if(item.index !== index) {
-                return item;                
+                return item;      
+                // if(newname === item.company_Name){
+                //     is_repeatsupplier = true;
+                // }  
             }    
             item.company_Name = newname;
-            if(newname === item.company_Name){
-                is_repeatsupplier = true;
-            }            
+                      
             return item;
         });
 
         this.setState({
-            supplierobject
+            supplierobject,
+            is_repeatsupplier
         })
     }
 
