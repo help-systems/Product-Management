@@ -107,9 +107,5 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                 ResultText = ex.ToString();
             }
         }
-
-        
-        
     }
-
 }
