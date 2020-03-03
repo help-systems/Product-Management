@@ -1,5 +1,6 @@
 import React from "react";
 import { MDBContainer, MDBBtn, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter} from 'mdbreact';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaPlus } from 'react-icons/fa';
 import { FaEdit } from 'react-icons/fa';
 import { MdDeleteForever} from "react-icons/md";
@@ -29,9 +30,9 @@ class TodoSuppliers extends React.Component {
         this.saveChange = this.saveChange.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
-        let url =this.state.base_url + `Suppliers/Get/`;			
+        let url =this.state.base_url + `Suppliers/`;			
         let response = await fetch(url);
         let supplierobject = await response.json();
         // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
@@ -69,15 +70,17 @@ class TodoSuppliers extends React.Component {
     }
 
     async SupplierSearch(){    
-        let url = this.state.base_url + `Suppliers/GetByName/${this.state.supplier}`;
+        let url = this.state.base_url + `Suppliers/${this.state.supplier}`;
         
         let response = await fetch(url);
         let supplierobj = await response.json();
         console.log(supplierobj);
+        supplierobj = supplierobj[0];
         supplierobj.edit = false;
 
         this.setState({
             supplierobj,
+            supplier:"",
             is_searchsupplier:true
         })		
     }
@@ -194,14 +197,17 @@ class TodoSuppliers extends React.Component {
     }
     
    async saveChange() {
+        let settings;
+        let response;
+        let url;
 
         if(this.state.is_delete){
-            // let supplierobject = this.state.supplierobject;
+            let supplierobject = this.state.supplierobject;
             let currentDeleter = this.state.currentDeleter;
 
-            let url = this.state.base_url + `Search/Search/${currentDeleter}`;
-			let settings = {
-				method: "Delete",
+            url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;
+			settings = {
+				method: "DELETE",
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
@@ -214,24 +220,41 @@ class TodoSuppliers extends React.Component {
 				body: `${currentDeleter}`
 			};
 			
-            let response = await fetch(url,settings);
+            response = await fetch(url,settings);
             
-            // supplierobject =  supplierobject.filter(item => {
-            //     if (item.company_Name !== this.state.currentDeleter) {
-            //         console.log(item.company_Name,"   ",this.state.currentDeleter)
-            //         return item;
-            //     }
-            // })
+            supplierobject =  supplierobject.filter(item => {
+                if (item.company_Name !== this.state.currentDeleter) {
+                    return item;
+                }
+            })
+
+            // let supplierobj = this.state.supplierobj;
+
+            // if(this.state.is_searchsupplier){
+            //     supplierobj.company_Name = this.state.currentEditer
+            // }
+
             this.setState({
                 is_delete:false,
+                is_searchsupplier:false,
+                supplier:"",
+                supplierobject,
+                supplierobj:{},
                 currentDeleter:""
             });
         }else if(this.state.is_edit) {
-            let new_name = this.state.currentEditer;
-            let company_Name = this.state.currentEDitSupplier.name;
+            let suppobj = [
+                {
+                    company_Name: this.state.currentEDitSupplier.name
+                },
+                {
+                    company_Name:this.state.currentEditer
+                }]
 
-            let url = this.state.base_url + `Search/Search/${new_name}`;
-			let settings = {
+                console.log(suppobj);
+
+            url = this.state.base_url + 'Suppliers';
+			settings = {
 				method: "PUT",
 				headers: {
 					Accept: 'application/json',
@@ -242,10 +265,10 @@ class TodoSuppliers extends React.Component {
 					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
 					'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
 				},
-				body: `${new_name}`
+				body: JSON.stringify(suppobj)
 			};
 			
-            let response = await fetch(url,settings);
+            response = await fetch(url,settings);
 
         }
 
@@ -261,10 +284,17 @@ class TodoSuppliers extends React.Component {
             }           
             return item;
         })
+        
+        let supplierobj = this.state.supplierobj;
+
+        if(this.state.is_searchsupplier){
+            supplierobj.company_Name = this.state.currentEditer
+        }
 
         this.setState({
             modal3: !this.state.modal3,
             supplierobject,
+            supplierobj,
             is_edit:false
         });
     }
