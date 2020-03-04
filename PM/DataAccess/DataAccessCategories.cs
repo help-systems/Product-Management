@@ -53,15 +53,8 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         public void InsertCategories(Categories categories)
         {
             rowsAffected = 0;
-<<<<<<< HEAD
-            string sql = "INSERT INTO [Categories](Parent_Category,Category_Name )";
-            sql += $" VALUES( '{categories.Parent_Category}','{categories.Category_Name}')";
-=======
-
-            // Create SQL statement to submit
             string sql = string.Format("INSERT INTO Categories (Parent_Category,Category_Name) VALUES ('{0}','{1}')",
                 categories.Parent_Category, categories.Category_Name);
->>>>>>> upstream/master
 
             try
             {
