@@ -99,8 +99,6 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                 throw (ex);
             }
         }
-<<<<<<< HEAD
-=======
 
 
         public void DeleteSuppliers(string company_name)
@@ -131,6 +129,5 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                 }
             }           
         }
->>>>>>> upstream/master
     }
 }

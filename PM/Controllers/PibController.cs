@@ -47,7 +47,7 @@ namespace AdonetCrud.Controllers
             try
             {
                 DataAccessPIB da = new DataAccessPIB();
-                da.InsertIntoBranch(pib);
+                da.InsertProductInBranch(pib);
             }
             catch(Exception ex)
             {
