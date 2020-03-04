@@ -45,15 +45,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                         ResultText = "Rows Affected: " + rowsAffected.ToString();
                     }
                 }
-                // using (SqlCommand cmd = new SqlCommand(sql, cnn))
-                //     {
-                  
-                //         cmd.CommandType = CommandType.Text;
-                    
-                //         rowsAffected = cmd.ExecuteNonQuery();
-
-                //         ResultText = "Rows Affected: " + rowsAffected.ToString();
-                //     }
+                
             }
         }
 

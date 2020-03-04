@@ -12,12 +12,12 @@ using PRODUCT_MANAGEMENT.DataAccess;
 namespace PRODUCT_MANAGEMENT.Controllers
 {
     [ApiController]
-    [Route("[controller]/[Action]")]
+    [Route("[controller]")]
     public class SuppliersController : ControllerBase
     {
-       
-        private readonly ILogger<ProductsController> _logger;
 
+        private readonly ILogger<ProductsController> _logger;
+        private readonly DataAccessSuppliers Data = new DataAccessSuppliers();
 
         public SuppliersController(ILogger<ProductsController> logger)
         {
@@ -29,81 +29,97 @@ namespace PRODUCT_MANAGEMENT.Controllers
         {
             try
             {
-                DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
-                List<Suppliers> suppliers = suppliersDALDC.GetSuppliersAsGenericList();
+                var result = Data.GetSuppliers();
 
-                return Ok(suppliers);
+                return Ok(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
         }
 
-         [HttpGet("{company_name}")]
-         public IActionResult GetByName (string company_name)
-         {
+
+        [HttpGet("{company_name}")]
+        public IActionResult Get(string company_name)
+        {
             try
             {
-                DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
-                var suppliers = suppliersDALDC.GetSuppliersAsGenericList().Where(x => x.Company_Name == company_name).ToList();
+                var result = Data.GetSuppliers().Where(x => x.Company_Name == company_name).ToList();
 
-                if (suppliers.Count() == 0)
+                if (result.Count() == 0)
                     return NotFound();
 
-                return Ok(suppliers);
+                return Ok(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
-         }
-      
+        }
+
+
         [HttpPost]
         public ActionResult Post(Suppliers suppliers)
         {
             try
             {
-                DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
-                suppliersDALDC.InsertSuppliers(suppliers);
+                Data.InsertSuppliers(suppliers);
+
+                return Ok();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
-            return Ok();
         }
-        [HttpDelete("{company_name}")]
-        public ActionResult Delete(string company_Name)
+
+
+        [HttpPut]
+        public ActionResult Put(List<Suppliers> supplier)
         {
             try
             {
-                DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
-                suppliersDALDC.DeleteSuppliers(company_Name);
+                var result = Data.UpdateSupplier(supplier[0], supplier[1]);
+
+                return Ok(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
-            return Ok();
         }
          
-           // ************************************* Help!!!!
-         [HttpPut]
+        [HttpPut]
         public ActionResult Update([FromBody] Suppliers suppliers, string s1, string s2 )
         {
             try
             {
                 DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
-                suppliersDALDC.UpdateSuppliers(suppliers,s1,s2);
+                return Ok();
             } 
             catch(Exception ex)
+           {
+               return BadRequest(ex);
+           }
+         
+        }
+
+
+
+        [HttpDelete]
+        public ActionResult Delete(string company_Name)
+        {
+            try
+            {
+                Data.DeleteSuppliers(company_Name);
+
+                return Ok();
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
-            return Ok();
-        }
-        
-
+        }     
     }
 }

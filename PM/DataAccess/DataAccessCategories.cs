@@ -13,7 +13,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         private int rowsAffected { get; set; }
         public string ResultText { get; set; }
 
-        public List<Categories> GetCategoriersAsGenericList()
+        public List<Categories> GetCategoriers ()
         {
             rowsAffected = 0;
             List<Categories> categories = new List<Categories>();
@@ -53,23 +53,18 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         public void InsertCategories(Categories categories)
         {
             rowsAffected = 0;
-
-            // Create SQL statement to submit
-            string sql = "INSERT INTO [Categories](Parent_Category,Category_Name )";
-            sql += $" VALUES( '{categories.Parent_Category}','{categories.Category_Name}')";
+            string sql = string.Format("INSERT INTO Categories (Parent_Category,Category_Name) VALUES ('{0}','{1}')",
+                categories.Parent_Category, categories.Category_Name);
 
             try
             {
                 using (SqlConnection cnn = new SqlConnection(AppSettings.ConnectionString))
                 {
-                    // Create command object in using block for automatic disposal
                     using (SqlCommand cmd = new SqlCommand(sql, cnn))
                     {
-                        // Set CommandType
+                        
                         cmd.CommandType = CommandType.Text;
-                        // Open the connection
                         cnn.Open();
-                        // Execute the INSERT statement
                         rowsAffected = cmd.ExecuteNonQuery();
 
                         ResultText = "Rows Affected: " + rowsAffected.ToString();
