@@ -1,6 +1,8 @@
 import React from "react";
 import { MDBContainer, MDBBtn, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter} from 'mdbreact';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaPlus } from 'react-icons/fa';
+import { FaMinus } from 'react-icons/fa';
 import { FaEdit } from 'react-icons/fa';
 import { MdDeleteForever} from "react-icons/md";
 
@@ -20,6 +22,7 @@ class TodoSuppliers extends React.Component {
             addsituation:false,
             currentEditer:"",
             currentDeleter:"",
+            inputNewSupplier:"",
             is_repeatsupplier:false,
             currentEDitSupplier:{name:"",index:""},
             supplierobject:[]
@@ -27,11 +30,12 @@ class TodoSuppliers extends React.Component {
         this.SupplierSearch = this.SupplierSearch.bind(this);
         this.handleSupplierChange = this.handleSupplierChange.bind(this);
         this.saveChange = this.saveChange.bind(this);
+        this.todoAdd = this.todoAdd.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
-        let url =this.state.base_url + `Suppliers/Get/`;			
+        let url =this.state.base_url + `Suppliers/`;			
         let response = await fetch(url);
         let supplierobject = await response.json();
         // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
@@ -42,7 +46,6 @@ class TodoSuppliers extends React.Component {
             i++
             return item;
         })
-        console.log(supplierobject)
         this.setState({
             supplierobject
         })
@@ -68,16 +71,24 @@ class TodoSuppliers extends React.Component {
         })
     }
 
+    handleInputNewSupplier = (e) => {
+        this.setState({
+            inputNewSupplier:e.target.value
+        })
+    }
+
     async SupplierSearch(){    
-        let url = this.state.base_url + `Suppliers/GetByName/${this.state.supplier}`;
+        let url = this.state.base_url + `Suppliers/${this.state.supplier}`;
         
         let response = await fetch(url);
         let supplierobj = await response.json();
         console.log(supplierobj);
+        supplierobj = supplierobj[0];
         supplierobj.edit = false;
 
         this.setState({
             supplierobj,
+            supplier:"",
             is_searchsupplier:true
         })		
     }
@@ -151,14 +162,6 @@ class TodoSuppliers extends React.Component {
           });
     }
 
-    todoDeleteSingle = (name) => {
-        this.setState({
-            modal3: !this.state.modal3,
-            is_delete:true,
-            currentDeleter:name
-          });
-    }
-
     cancelChange = () =>{
         let supplierobject = this.state.supplierobject;
         let currentEDitSupplier = this.state.currentEDitSupplier;
@@ -194,14 +197,17 @@ class TodoSuppliers extends React.Component {
     }
     
    async saveChange() {
+        let settings;
+        let response;
+        let url;
 
         if(this.state.is_delete){
-            // let supplierobject = this.state.supplierobject;
+            let supplierobject = this.state.supplierobject;
             let currentDeleter = this.state.currentDeleter;
 
-            let url = this.state.base_url + `Search/Search/${currentDeleter}`;
-			let settings = {
-				method: "Delete",
+            url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;
+			settings = {
+				method: "DELETE",
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
@@ -214,24 +220,41 @@ class TodoSuppliers extends React.Component {
 				body: `${currentDeleter}`
 			};
 			
-            let response = await fetch(url,settings);
+            response = await fetch(url,settings);
             
-            // supplierobject =  supplierobject.filter(item => {
-            //     if (item.company_Name !== this.state.currentDeleter) {
-            //         console.log(item.company_Name,"   ",this.state.currentDeleter)
-            //         return item;
-            //     }
-            // })
+            supplierobject =  supplierobject.filter(item => {
+                if (item.company_Name !== this.state.currentDeleter) {
+                    return item;
+                }
+            })
+
+            // let supplierobj = this.state.supplierobj;
+
+            // if(this.state.is_searchsupplier){
+            //     supplierobj.company_Name = this.state.currentEditer
+            // }
+
             this.setState({
                 is_delete:false,
+                is_searchsupplier:false,
+                supplier:"",
+                supplierobject,
+                supplierobj:{},
                 currentDeleter:""
             });
         }else if(this.state.is_edit) {
-            let new_name = this.state.currentEditer;
-            let company_Name = this.state.currentEDitSupplier.name;
+            let suppobj = [
+                {
+                    company_Name: this.state.currentEDitSupplier.name
+                },
+                {
+                    company_Name:this.state.currentEditer
+                }]
 
-            let url = this.state.base_url + `Search/Search/${new_name}`;
-			let settings = {
+                console.log(suppobj);
+
+            url = this.state.base_url + 'Suppliers';
+			settings = {
 				method: "PUT",
 				headers: {
 					Accept: 'application/json',
@@ -242,10 +265,10 @@ class TodoSuppliers extends React.Component {
 					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
 					'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
 				},
-				body: `${new_name}`
+				body: JSON.stringify(suppobj)
 			};
 			
-            let response = await fetch(url,settings);
+            response = await fetch(url,settings);
 
         }
 
@@ -261,16 +284,58 @@ class TodoSuppliers extends React.Component {
             }           
             return item;
         })
+        
+        let supplierobj = this.state.supplierobj;
+
+        if(this.state.is_searchsupplier){
+            supplierobj.company_Name = this.state.currentEditer
+        }
 
         this.setState({
             modal3: !this.state.modal3,
             supplierobject,
+            supplierobj,
             is_edit:false
         });
     }
 
-    todoAdd = ()=> {
-        console.log("Hiiiiii")
+    plus = () => {
+        this.setState({
+            addsituation:true
+        })
+    }
+
+    minus = () => {
+        this.setState({
+            addsituation:false,
+            inputNewSupplier:""
+        })
+    }
+    async todoAdd () {
+
+        if(this.state.inputNewSupplier.trim() !== ""){
+
+            // let url = this.state.base_url + `Search/Search/${JSON.stringify ()}`;
+            // 	let settings = {
+            // 		method: "POST",
+            // 		headers: {
+            // 			Accept: 'application/json',
+            // 			'Content-Type': 'application/json',
+
+            // 			'Access-Control-Allow-Origin': '*',
+            // 			'Access-Control-Allow-Credentials': true,
+            // 			'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+            // 			'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
+            // 		},
+            // 		body: `${}`
+            // 	};
+                
+            // 	let response = await fetch(url,settings);
+            // 	let maindata = await response.json();
+
+        }
+
+        
         this.setState({
             addsituation:true
         })
@@ -298,6 +363,11 @@ class TodoSuppliers extends React.Component {
                     {
                         this.state.addsituation ?
                         <div>
+                        <span className="table-add float-right mb-3 mr-2">
+                            <a href="#" className="text-success">
+                            <FaMinus className = "minus" onClick = {this.minus}/>
+                            </a>
+                         </span>
                         <table className="table table-bordered table-responsive-md table-striped text-center">
                             <thead>
                                 <tr>
@@ -307,19 +377,23 @@ class TodoSuppliers extends React.Component {
                             <tbody className = "mainlisthov">
                                 <tr>
                                     <td>
-                                        <input type="text"/>
+                                        <input 
+                                        type="text" 
+                                        onChange = {(e)=> {this.handleInputNewSupplier(e)}}
+                                        value = {this.state.inputNewSupplier}
+                                        />
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <div>
-                            <button>ADD</button>
+                            <button onClick = {this.todoAdd}>ADD</button>
                         </div>
                         </div>
                         :
                         <span className="table-add float-right mb-3 mr-2">
                             <a href="#" className="text-success">
-                            <FaPlus onClick = {this.todoAdd}/>
+                            <FaPlus onClick = {this.plus}/>
                             </a>
                          </span>
 
@@ -356,7 +430,7 @@ class TodoSuppliers extends React.Component {
                                             <input 
                                                 type="text" 
                                                 value =  {this.state.currentEditer} 
-                                                className="editedSuppier repeatsupp" 
+                                                className="edited repeatsupp" 
                                                 onChange = {(e) => {this.handleSupplierChangeSingle(e)}}  
 
                                             />
@@ -364,7 +438,7 @@ class TodoSuppliers extends React.Component {
                                             <input 
                                                 type="text" 
                                                 value =  {this.state.currentEditer} 
-                                                className="editedSuppier" 
+                                                className="edited" 
                                                 onChange = {(e) => {this.handleSupplierChangeSingle(e)}}  
                                                 />
                                         }
@@ -394,7 +468,7 @@ class TodoSuppliers extends React.Component {
                                             className = "deletebutton"
                                             color="primary" 
                                             onClick={(e)=>{
-                                                this.todoDeleteSingle(this.state.supplierobj.company_Name);
+                                                this.todoDelete(this.state.supplierobj.company_Name);
                                             }}
                                         >
                                             <MdDeleteForever className = "deleteicon"/>
@@ -464,7 +538,7 @@ class TodoSuppliers extends React.Component {
                                                         <input 
                                                             type="text" 
                                                             value =  {this.state.currentEditer} 
-                                                            className="editedSuppier repeatsupp" 
+                                                            className="edited repeatsupp" 
                                                             onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
 
                                                         />
@@ -472,7 +546,7 @@ class TodoSuppliers extends React.Component {
                                                         <input 
                                                             type="text" 
                                                             value =  {this.state.currentEditer} 
-                                                            className="editedSuppier" 
+                                                            className="edited" 
                                                             onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
                                                          />
                                                    }

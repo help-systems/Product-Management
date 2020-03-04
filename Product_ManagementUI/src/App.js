@@ -33,20 +33,12 @@ class App extends React.Component {
 		let pagelists = this.state.pagelists;
 		for (let i = 0; i < pagelists.length; i++) {
 			i === index ?
-				pagelists[i] = true:
+				pagelists[i] = true
+				:
 				pagelists[i] = false			
 		}
 		
-		if(pagelists[2]) {
-
-			let url = this.state.base_url + `Categories/Get/`;			
-			let response = await fetch(url);
-			let categoryobject = await response.json();
-			this.setState({
-				categoryobject
-			})
-
-		}
+		
 
 		if(pagelists[3]) {
 

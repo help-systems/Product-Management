@@ -133,7 +133,7 @@ padding-right: 13px;
     font-size: 19px;
     margin-right: 6px;
 }
-.editedSuppier {
+.edited {
     border:none;
 }
 .pt-3-half {
@@ -155,4 +155,7 @@ padding-right: 13px;
 }
 .repeatsupp{
     border: 1px solid red;
+}
+.minus {
+    color: red !important;
 }
