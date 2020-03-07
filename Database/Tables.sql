@@ -14,7 +14,7 @@ GO
 CREATE TABLE Branches(
 	Branch_Name varchar(50) Primary key NOT NULL,
 	Address_ID int,
-    Foreign key(Address_ID) references Addresses(ID)
+    Foreign key(Address_ID) references Addresses(ID) ON UPDATE CASCADE ON DELETE CASCADE
 )
 
 GO
@@ -35,7 +35,7 @@ CREATE TABLE Customers(
 	Address_ID int,
 
 	PRIMARY KEY([User_Id]),
-    Foreign key(Address_ID) references Addresses(ID)
+    Foreign key(Address_ID) references Addresses(ID) ON UPDATE CASCADE ON DELETE CASCADE
 )
 
 GO
@@ -45,7 +45,7 @@ CREATE TABLE Transactions(
 	Amount money NULL default 0,
 	Status char(10) NOT NULL,
 	Payment_Type char(10),
-	Branch_name varchar(50) foreign key references Branches(Branch_Name)
+	Branch_name varchar(50) foreign key references Branches(Branch_Name) ON UPDATE CASCADE ON DELETE CASCADE
 )
 
 GO
@@ -60,7 +60,7 @@ CREATE TABLE Workers(
 GO
 
 CREATE TABLE Delivery_Person(
-	Delivery_Id int foreign key references Workers(Worker_Id),
+	Delivery_Id int foreign key references Workers(Worker_Id) ON UPDATE CASCADE ON DELETE CASCADE,
 	Social_Id VARCHAR(24) NOT NULL unique,
 	primary key(Delivery_id)
 )
@@ -76,7 +76,7 @@ CREATE TABLE Orders(
 	Order_Confirm_Date datetime  NULL,
 	Planned_Delivery_Receive_Date datetime NULL,
 	Address_ID int,
-    Foreign key(Address_ID) references Addresses(ID),
+    Foreign key(Address_ID) references Addresses(ID) ON UPDATE CASCADE ON DELETE CASCADE,
 
 	PRIMARY KEY(Order_Id)
 )
@@ -96,13 +96,15 @@ CREATE TABLE Categories(
 
 GO
 
+SELECT * FROM Categories
+
 CREATE TABLE Products(
 	Barcode char(14) Primary Key NOT NULL,
 	Cost_Price money NOT NULL,
 	Selling_Price money NOT NULL,
-    Supplier_Name varchar(50) foreign key references Suppliers(Company_Name),
+    Supplier_Name varchar(50) foreign key references Suppliers(Company_Name) ON UPDATE CASCADE ON DELETE CASCADE,
 	Name varchar(50) NOT NULL, 
-    Category_Name varchar(50) foreign key references Categories(Category_Name)
+    Category_Name varchar(50) foreign key references Categories(Category_Name) ON UPDATE CASCADE ON DELETE CASCADE
 )
 
 GO
@@ -145,7 +147,7 @@ CREATE TABLE Branches_Warehouses(
 GO
 
 CREATE TABLE Products_input_date (
-  Product_code char(14) foreign key references Products(Barcode),
+  Product_code char(14) foreign key references Products(Barcode) ON UPDATE CASCADE ON DELETE CASCADE,
   Warehouse_name varchar(50) foreign key references Warehouses(Warehouse_Name),
   Date_ date NOT NULL,
   Quantity int NOT NULL,
@@ -155,7 +157,7 @@ CREATE TABLE Products_input_date (
 GO
 
 CREATE TABLE Products_in_Branches (
-	Product_code char(14) foreign key references Products(Barcode),
+	Product_code char(14) foreign key references Products(Barcode) ON UPDATE CASCADE ON DELETE CASCADE,
 	Branch_name varchar(50) foreign key references Branches(Branch_Name),
 	[Count] int, 
 	PRIMARY KEY(Product_code, Branch_Name)
@@ -164,8 +166,8 @@ CREATE TABLE Products_in_Branches (
 GO
 
 Create Table Transaction_Products(
-	TransactionID bigint foreign key references Transactions(Id),
-	ProductsCode char(14) foreign key references Products (Barcode),
+	TransactionID bigint foreign key references Transactions(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+	ProductsCode char(14) foreign key references Products (Barcode) ON UPDATE CASCADE ON DELETE CASCADE,
     [Count] int NOT NULL,
 	Primary Key(TransactionID,ProductsCode)
 )
@@ -193,8 +195,8 @@ GO
 
 CREATE TABLE Suppliers_Warehouses
 (
-	Supplier_name varchar(50) foreign key references Suppliers (Company_Name),
-	Warehouse_name varchar(50) foreign key references Warehouses (Warehouse_Name),
+	Supplier_name varchar(50) foreign key references Suppliers (Company_Name) ON UPDATE CASCADE ON DELETE CASCADE,
+	Warehouse_name varchar(50) foreign key references Warehouses (Warehouse_Name) ON UPDATE CASCADE ON DELETE CASCADE,
 	[Count] int NOT NULL, -- sxal dasht----------------------------------------------------------------
 	Product_take_out_date datetime NOT NULL,
 	Product_receiving_date datetime NOT NULL,
@@ -209,7 +211,7 @@ CREATE TABLE TCT(
 	Terminal_Id int,
 	Branch_Name varchar(50),
 	Foreign key(Terminal_ID, Branch_Name) references Terminals(Id, Branch_Name),
-	Cashier_Id int foreign key references Cashiers(Cashier_Id),
+	Cashier_Id int foreign key references Cashiers(Cashier_Id) ON UPDATE CASCADE ON DELETE CASCADE,
 	Primary Key(Transaction_Id,Terminal_Id)
 )
 

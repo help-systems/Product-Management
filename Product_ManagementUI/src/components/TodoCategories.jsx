@@ -44,7 +44,7 @@ class TodoCategories extends React.Component {
 
     async componentDidMount() {
 
-        let url =this.state.base_url + `Categories/Get/`;			
+        let url =this.state.base_url + `Categories/`;			
         let response = await fetch(url);
         let categoryobject = await response.json();
         // let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"koko",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
@@ -107,32 +107,41 @@ class TodoCategories extends React.Component {
     
     async CategorySearch(){    
 
-        let url = this.state.base_url + `Category/GetByName/${this.state.category}`;//poxel
-        
-        let response = await fetch(url);
-        let categoryobj = await response.json();        
-        categoryobj = categoryobj[0];
+        if(this.state.category.trim()!==""){
+            let url = this.state.base_url + `Categories/${this.state.category}`;
+            
+            let response = await fetch(url);
+            let categoryobj = await response.json();  
+            console.log(categoryobj);
 
-        if(!categoryobj){
+            if(!categoryobj){
+                this.setState({
+                    categoryobj:{},
+                    is_searchcategory:false,
+                    is_dublicate:false,
+                    is_wrongcategory:true,
+                });
+            }else {
+                console.log(categoryobj);
+                categoryobj = categoryobj[0];
+                categoryobj.edit = false;
+
+                this.setState({
+                    categoryobj,
+                    is_wrongcategory:false,
+                    category:"",
+                    is_searchcategory:true,
+                    is_dublicate:false
+                })	
+            }	
+        }
+        else{
             this.setState({
                 categoryobj:{},
                 is_searchcategory:false,
-                is_dublicate:false,
-                is_wrongcategory:true,
-            });
-        }else {
-            let categoryobj = this.state.categoryobject[0];
-            console.log(categoryobj);
-            categoryobj.edit = false;
-
-            this.setState({
-                categoryobj:{},
-                is_wrongcategory:false,
-                category:"",
-                is_searchcategory:true,
                 is_dublicate:false
-            })	
-        }		
+            });
+        }	
     }
 
     todoSave(index,e) {
@@ -270,7 +279,7 @@ class TodoCategories extends React.Component {
             
             let currentDeleter = this.state.currentDeleter;
 
-            url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;///poxel
+            url = this.state.base_url + `Categories/${currentDeleter}`;
 			settings = {
 				method: "DELETE",
 				headers: {
@@ -321,7 +330,7 @@ class TodoCategories extends React.Component {
 
                 console.log(suppobj);
 
-            url = this.state.base_url + 'Suppliers';
+            url = this.state.base_url + 'Categories';
 			settings = {
 				method: "PUT",
 				headers: {
@@ -358,7 +367,7 @@ class TodoCategories extends React.Component {
         }else if (this.state.is_add){
 
             let newcategory = {category_Name: this.state.inputNewCategory,parent_Category:this.state.selectParentCategory}    
-            url = this.state.base_url + 'Suppliers';
+            url = this.state.base_url + 'Categories';
             settings = {
                 method: "POST",
                 headers: {
@@ -487,6 +496,7 @@ class TodoCategories extends React.Component {
                 <input 
                     type="text" 
                     placeholder = "Category"
+                    value = {this.state.category}
                     onChange = {this.handleInputCategory}
                 />
                 <button onClick = {this.CategorySearch}>Search</button>
