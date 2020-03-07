@@ -20,6 +20,7 @@ class TodoCategories extends React.Component {
             is_delete:false,
             is_edit:false,
             is_add:false,
+            is_wrongcategory:false,
             is_dublicate:false,
             inputNewCategory:"",
             parentCategories:[],
@@ -105,19 +106,33 @@ class TodoCategories extends React.Component {
     }
     
     async CategorySearch(){    
+
         let url = this.state.base_url + `Category/GetByName/${this.state.category}`;//poxel
         
         let response = await fetch(url);
-        let categoryobj = await response.json();
+        let categoryobj = await response.json();        
         categoryobj = categoryobj[0];
-        console.log(categoryobj);
-        categoryobj.edit = false;
 
-        this.setState({
-            categoryobj,
-            category:"",
-            is_searchCategory:true
-        })		
+        if(!categoryobj){
+            this.setState({
+                categoryobj:{},
+                is_searchcategory:false,
+                is_dublicate:false,
+                is_wrongcategory:true,
+            });
+        }else {
+            let categoryobj = this.state.categoryobject[0];
+            console.log(categoryobj);
+            categoryobj.edit = false;
+
+            this.setState({
+                categoryobj:{},
+                is_wrongcategory:false,
+                category:"",
+                is_searchcategory:true,
+                is_dublicate:false
+            })	
+        }		
     }
 
     todoSave(index,e) {
@@ -153,7 +168,6 @@ class TodoCategories extends React.Component {
         let currentEDitCategory;
         categoryobject.map(item => {
           if(item.category_Name === category){
-              console.log(item.category_Name)
               item.edit = !item.edit;
               currentEDitCategory= {
                 category_Name:category,
@@ -477,6 +491,14 @@ class TodoCategories extends React.Component {
                 />
                 <button onClick = {this.CategorySearch}>Search</button>
             </div>
+            {
+                this.state.is_wrongcategory ?
+                    <small id="passwordHelpBlock" className="form-text text-muted is_duplicate">
+                        Category name is wrong!
+                    </small>
+                :
+                    ""
+            }
             <div id="table" className="table-editable">
             {
                 this.state.addsituation ?
@@ -489,7 +511,7 @@ class TodoCategories extends React.Component {
                         </span>
                     </div>
                     <div className="form-group">
-                        <label for="inlineFormCustomSelectPref">Parent Category</label>
+                        <label htmlFor ="inlineFormCustomSelectPref">Parent Category</label>
                         <select 
                             className="custom-select my-1 mr-sm-2" 
                             id="inlineFormCustomSelectPref"
@@ -508,7 +530,7 @@ class TodoCategories extends React.Component {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label for="inputPassword5">Category</label>
+                        <label htmlFor="inputPassword5">Category</label>
                         <input 
                             type="text" 
                             id="inputPassword5" 

@@ -21,6 +21,7 @@ class TodoSuppliers extends React.Component {
             is_edit:false,
             addsituation:false,
             is_dublicate:false,
+            is_wrongsupplier:false,
             is_add:false,
             currentEditer:"",
             currentDeleter:"",
@@ -81,20 +82,33 @@ class TodoSuppliers extends React.Component {
         })
     }
 
-    async SupplierSearch(){    
+    async SupplierSearch(){  
+
         let url = this.state.base_url + `Suppliers/${this.state.supplier}`;
         
         let response = await fetch(url);
         let supplierobj = await response.json();
-        console.log(supplierobj);
-        supplierobj = supplierobj[0];
-        supplierobj.edit = false;
+        console.log(supplierobj);      
+        
+        if(!supplierobj){
+            this.setState({
+                supplierobj:{},
+                is_searchsupplier:false,
+                is_dublicate:false,
+                is_wrongsupplier:true,
+            });
+        }else {
+            supplierobj = supplierobj[0];
+            supplierobj.edit = false;
 
-        this.setState({
-            supplierobj,
-            supplier:"",
-            is_searchsupplier:true
-        })		
+            this.setState({
+                supplierobj:{},
+                is_wrongsupplier:false,
+                supplier:"",
+                is_searchsupplier:true,
+                is_dublicate:false
+            })	
+        }		
     }
 
     todoSave(index,e) {
@@ -392,8 +406,16 @@ class TodoSuppliers extends React.Component {
                         placeholder = "Supplier"
                         onChange = {this.handleInputSupplier}
                         />
-                    <button onClick = {this.SupplierSearch}>Search</button>
+                    <button onClick = {this.SupplierSearch}>Search</button>                    
                 </div>
+                {
+                    this.state.is_wrongcategory ?
+                        <small id="passwordHelpBlock" className="form-text text-muted is_duplicate">
+                            Category name is wrong!
+                        </small>
+                    :
+                        ""
+                }
                 <div id="table" className="table-editable">
                     {
                         this.state.addsituation ?
@@ -407,7 +429,7 @@ class TodoSuppliers extends React.Component {
                                 </span>
                             </div>
                             <div className="form-group">
-                                <label for="inputPassword5">Supplier</label>
+                                <label htmlFor="inputPassword5">Supplier</label>
                                 <input 
                                     type="text" 
                                     id="inputPassword5" 
