@@ -18,8 +18,11 @@ class TodoCategories extends React.Component {
             category:"",       
             modal3: false,
             is_delete:false,
-            is_edit:true,
+            is_edit:false,
+            is_add:false,
+            is_dublicate:false,
             inputNewCategory:"",
+            parentCategories:[],
             addsituation:false,
             currentCategory:"",
             selectParentCategory:"",
@@ -32,19 +35,23 @@ class TodoCategories extends React.Component {
         this.CategorySearch = this.CategorySearch.bind(this);
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.handleParentCategoryChange = this.handleParentCategoryChange.bind(this);
-        this.handleCategoryChangeSingle = this.handleCategoryChangeSingle.bind(this);
-        this.handleParentCategoryChangeSingle = this.handleParentCategoryChangeSingle.bind(this);
+        // this.handleCategoryChangeSingle = this.handleCategoryChangeSingle.bind(this);
+        // this.handleParentCategoryChangeSingle = this.handleParentCategoryChangeSingle.bind(this);
         this.saveChange = this.saveChange.bind(this);
+        this.todoAdd = this.todoAdd.bind(this);
     }
 
     async componentDidMount() {
 
-        // let url =this.state.base_url + `Categories/Get/`;			
-        // let response = await fetch(url);
-        // let categoryobject = await response.json();
-        let categoryobject = [{parent_Category:"gsdgxdfg",category_Name:"wine"},{parent_Category:"koko",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
+        let url =this.state.base_url + `Categories/Get/`;			
+        let response = await fetch(url);
+        let categoryobject = await response.json();
+        // let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"koko",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
         let i = 1;
         categoryobject.map(item => {
+            if(item.parent_Category === null) {
+                item.parent_Category = "-";
+            }
             item.edit = false;
             item.index = i;
             i++
@@ -78,19 +85,25 @@ class TodoCategories extends React.Component {
         })
     }
 
-    handleCategoryChangeSingle(e){
+    handleCategoryChangeSingle = (e) => {
         this.setState({
             currentCategory:e.target.value
         })
     }
 
-    handleParentCategoryChangeSingle(e){
+    handleParentCategoryChangeSingle = (e) =>{
 
         this.setState({
             currentParentCategory:e.target.value
         })
     }
-
+    
+    handleInputNewCategory = (e) => {
+        this.setState({
+            inputNewCategory:e.target.value
+        })
+    }
+    
     async CategorySearch(){    
         let url = this.state.base_url + `Category/GetByName/${this.state.category}`;//poxel
         
@@ -235,30 +248,33 @@ class TodoCategories extends React.Component {
         let settings;
         let response;
         let url;
+        let categoryobject = this.state.categoryobject;
+        let is_dublicate = this.state.is_dublicate;
 
         if(this.state.is_delete){
-            let categoryobject = this.state.categoryobject;
+            
+            
             let currentDeleter = this.state.currentDeleter;
 
-            // url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;///poxel
-			// settings = {
-			// 	method: "DELETE",
-			// 	headers: {
-			// 		Accept: 'application/json',
-			// 		'Content-Type': 'application/json',
+            url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;///poxel
+			settings = {
+				method: "DELETE",
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
 
-			// 		'Access-Control-Allow-Origin': '*',
-			// 		'Access-Control-Allow-Credentials': true,
-			// 		'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
-			// 		'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
-			// 	},
-			// 	body: `${currentDeleter}`
-			// };
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Credentials': true,
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+					'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
+				},
+				body: `${currentDeleter}`
+			};
 			
-            // response = await fetch(url,settings);
+            response = await fetch(url,settings);
             
             categoryobject =  categoryobject.filter(item => {
-                if (item.category_Name !== this.state.currentDeleter) {
+                if (item.category_Name !== currentDeleter) {
                     return item;
                 }
             })
@@ -274,58 +290,94 @@ class TodoCategories extends React.Component {
                 is_delete:false,
                 is_searchcategory:false,
                 category:"",
-                categoryobject,
+                categoryobject:categoryobject,
                 categoryobj:{},
                 currentDeleter:""
             });
+
         }else if(this.state.is_edit) {
-            // let suppobj = [
-            //     {
-            //         company_Name: this.state.currentEDitCategory.name
-            //     },
-            //     {
-            //         company_Name:this.state.currentCategory
-            //     }]
 
-            //     console.log(suppobj);
+            let suppobj = [
+                {
+                    company_Name: this.state.currentEDitCategory.name
+                },
+                {
+                    company_Name:this.state.currentCategory
+                }]
 
-            // url = this.state.base_url + 'Suppliers';
-			// settings = {
-			// 	method: "PUT",
-			// 	headers: {
-			// 		Accept: 'application/json',
-			// 		'Content-Type': 'application/json',
+                console.log(suppobj);
 
-			// 		'Access-Control-Allow-Origin': '*',
-			// 		'Access-Control-Allow-Credentials': true,
-			// 		'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
-			// 		'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
-			// 	},
-			// 	body: JSON.stringify(suppobj)
-			// };
+            url = this.state.base_url + 'Suppliers';
+			settings = {
+				method: "PUT",
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Credentials': true,
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+					'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
+				},
+				body: JSON.stringify(suppobj)
+			};
 			
-            // response = await fetch(url,settings);
+            response = await fetch(url,settings);
 
-        }
-
-        let categoryobject = this.state.categoryobject;
-
-        categoryobject.map(item => {
-            if(item.index !== this.state.currentEDitCategory.index){
+            categoryobject.map(item => {
+                if(item.index !== this.state.currentEDitCategory.index){
+                    return item;
+                }
+                if(this.state.currentCategory.trim() === ""){
+                    item.category_Name = this.state.currentEDitCategory.category_Name;
+                }else {
+                    item.category_Name = this.state.currentCategory;
+                }    
+                if(this.state.currentParentCategory.trim() === ""){
+                    item.parent_Category = this.state.currentEDitCategory.parent_Category;
+                }else {
+                    item.parent_Category = this.state.currentParentCategory;
+                }         
                 return item;
+            })
+
+        }else if (this.state.is_add){
+
+            let newcategory = {category_Name: this.state.inputNewCategory,parent_Category:this.state.selectParentCategory}    
+            url = this.state.base_url + 'Suppliers';
+            settings = {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': true,
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+                    'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
+                },
+                body: JSON.stringify (newcategory)
+            };                    
+            response = await fetch(url,settings);
+
+            if(newcategory.parent_Category === "null"){
+                newcategory.parent_Category = "-";
             }
-            if(this.state.currentCategory.trim() === ""){
-                item.category_Name = this.state.currentEDitCategory.category_Name;
-            }else {
-                item.category_Name = this.state.currentCategory;
-            }    
-            if(this.state.currentParentCategory.trim() === ""){
-                item.parent_Category = this.state.currentEDitCategory.parent_Category;
-            }else {
-                item.parent_Category = this.state.currentParentCategory;
-            }         
-            return item;
-        })
+
+            newcategory.edit = false;
+            newcategory.index = 1;  
+            console.log( newcategory);
+            categoryobject.unshift(newcategory); 
+            console.log(categoryobject)
+
+            this.setState({                    
+                addsituation:false,
+                is_dublicate,
+                categoryobject
+            })
+            
+        }      
+        
         
         let categoryobj = this.state.categoryobj;
 
@@ -339,14 +391,28 @@ class TodoCategories extends React.Component {
             modal3: !this.state.modal3,
             categoryobject,
             categoryobj,
-            is_edit:false
+            is_edit:false,
+            is_add:false,
+            is_dublicate:false,
+            currentCategory:"",
+            currentParentCategory:"",
+            inputNewCategory:"",
+            currentEDitCategory:{category_Name:"",parent_Category:"",index:""}
         });
     }
 
 
     plus = () => {
+        let categoryobject = this.state.categoryobject;
+        let parentCategories = [...new Set(categoryobject.map(item => item.parent_Category))];
+        console.log(parentCategories)
+        parentCategories = parentCategories.filter(item => {
+            return item !== "-";
+        })
         this.setState({
-            addsituation:true
+            addsituation:true,
+            is_dublicate:false,
+            parentCategories
         })
     }
 
@@ -354,39 +420,33 @@ class TodoCategories extends React.Component {
         this.setState({
             addsituation:false,
             inputNewCategory:"",
-            selectParentCategory:""
+            selectParentCategory:"",
+            is_dublicate:false
         })
     }
-    async todoAdd () {
 
-        if(this.state.inputNewCategory.trim() !== "" && this.state.selectParentCategory !== "Select Parent" ||this.state.selectParentCategory !== "" ){
+    async todoAdd () {       
 
-            // let url = this.state.base_url + `Search/Search/${JSON.stringify ()}`;
-            // 	let settings = {
-            // 		method: "POST",
-            // 		headers: {
-            // 			Accept: 'application/json',
-            // 			'Content-Type': 'application/json',
-
-            // 			'Access-Control-Allow-Origin': '*',
-            // 			'Access-Control-Allow-Credentials': true,
-            // 			'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
-            // 			'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
-            // 		},
-            // 		body: `${}`
-            // 	};
-                
-            // 	let response = await fetch(url,settings);
-            // 	let maindata = await response.json();
-
-        }
-
-        
-        this.setState({
-            addsituation:false,
-            inputNewCategory:"",
-            selectParentCategory:""
+        let is_dublicate = this.state.is_dublicate;
+        let categoryobject = this.state.categoryobject;
+        is_dublicate = categoryobject.some(item => {
+            return item.category_Name === this.state.inputNewCategory;
         })
+        if(!is_dublicate && 
+          this.state.selectParentCategory !== "Choose..." && this.state.selectParentCategory !== "" &&
+          this.state.inputNewCategory.trim() !== "") {
+
+            this.setState({
+                modal3: !this.state.modal3,
+                is_add:true,
+                is_dublicate
+            }); 
+        }else {
+            this.setState({
+                addsituation:true,
+                is_dublicate:true
+            })
+        } 
     }
 
     setCategory = (e) => {
@@ -414,56 +474,66 @@ class TodoCategories extends React.Component {
                     type="text" 
                     placeholder = "Category"
                     onChange = {this.handleInputCategory}
-                    />
+                />
                 <button onClick = {this.CategorySearch}>Search</button>
             </div>
             <div id="table" className="table-editable">
             {
                 this.state.addsituation ?
-                <div>
-                    <span className="table-add float-right mb-3 mr-2">
-                        <a href="#" className="text-success">
-                        <FaMinus className = "minus" onClick = {this.minus}/>
-                        </a>
-                    </span>
-                    <table className="table table-bordered table-responsive-md table-striped text-center">
-                        <thead>
-                            <tr>
-                                <th className="text-center">Parent Category</th>
-                                <th className="text-center">New Category Name</th>
-                            </tr>
-                        </thead>
-                        <tbody className = "mainlisthov">
-                            <tr>
-                                <td>
-                                    <select name="" id="" onClick= {this.setCategory}>
-                                    <option selected disabled >
-                                        Select Parent
-                                    </option >
-                                    <option value="null"> - </option>
-                                        { 
-                                            this.state.categoryobject.map(item => {
-                                                {i++};
-                                                return(
-                                                   <option key = {i} value={item.parent_Category}>{item.parent_Category}</option>
-                                                );
-                                            })
-                                        }
-                                        
-                                    </select>
-                                </td>
-                                <td>
-                                    <input 
-                                    type="text"                                    
-                                    onChange = {(e)=> {this.handleInputNewCategory(e)}}
-                                    value = {this.state.inputNewCategory}    
-                                />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div id = "addnewvalues">
+                    <div id = "FaMinus">
+                        <span className="table-add float-right mb-3 mr-2">
+                            <a href="#" className="text-success">
+                            <FaMinus className = "minus" onClick = {this.minus}/>
+                            </a>
+                        </span>
+                    </div>
+                    <div className="form-group">
+                        <label for="inlineFormCustomSelectPref">Parent Category</label>
+                        <select 
+                            className="custom-select my-1 mr-sm-2" 
+                            id="inlineFormCustomSelectPref"
+                            onClick= {this.setCategory}
+                        >
+                            <option selected disabled>Choose...</option>
+                            <option value="null"> - </option>
+                            { 
+                                this.state.parentCategories.map(item => {
+                                    {i++};
+                                    return(
+                                        <option key = {i} value={item}>{item}</option>
+                                    );
+                                })
+                            }
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label for="inputPassword5">Category</label>
+                        <input 
+                            type="text" 
+                            id="inputPassword5" 
+                            className="form-control" 
+                            aria-describedby="passwordHelpBlock"
+                            onChange = {this.handleInputNewCategory}
+                            value = {this.state.inputNewCategory}
+                            placeholder = "Category"
+                        /> 
+                    </div>
+                    {
+                        this.state.is_dublicate ?
+                        <small id="passwordHelpBlock" className="form-text text-muted is_duplicate">
+                            Your must choose Parent Category or the Category name already exists!
+                        </small>
+                        :
+                        ""
+                    } 
                     <div>
-                        <button  onClick = {this.todoAdd}>ADD</button>
+                        <MDBBtn 
+                            color="primary" 
+                            onClick={this.todoAdd}
+                            >
+                                ADD
+                        </MDBBtn> 
                     </div>
                 </div>
                 :
@@ -472,10 +542,8 @@ class TodoCategories extends React.Component {
                     <FaPlus onClick = {this.plus}/>
                     </a>
                 </span>
-
             }
             {
-                
                 this.state.is_searchcategory?
 
                 <table className="table table-bordered table-responsive-md table-striped text-center">
@@ -600,7 +668,7 @@ class TodoCategories extends React.Component {
                 :          
 
                 this.state.categoryobject.length > 0 ?
-                   <table className="table table-bordered table-responsive-md table-striped text-center">                        
+                   <table key = "allcategory " className="table table-bordered table-responsive-md table-striped text-center">                        
                     <thead>
                         <tr>
                             <th className="text-center">#</th>
@@ -610,7 +678,7 @@ class TodoCategories extends React.Component {
                             <th className="text-center">Remove</th>
                         </tr>
                     </thead>
-                    <tbody className = "mainlisthov">
+                    <tbody key = "allcategory_body" className = "mainlisthov">
                     { 
                         this.state.categoryobject.map(item=>{
                            

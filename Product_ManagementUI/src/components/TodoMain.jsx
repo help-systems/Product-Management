@@ -84,6 +84,7 @@ class TodoMain extends React.Component {
                                     <th scope="col">Barcode</th>
                                     <th scope="col">Product Name</th>
                                     <th scope="col">Supplier Name</th>
+                                    <th scope="col">Btranch / Warehouse Name</th>
                                     <th scope="col">Cost Price</th>
                                     <th scope="col">Selling Price</th>
                                     <th scope="col">Category Name</th>
@@ -104,6 +105,9 @@ class TodoMain extends React.Component {
                                             </td>
                                             <td>
                                                 {item.supplier_Name}
+                                            </td>
+                                            <td>
+                                                {item.bW_Name}
                                             </td>
                                             <td>
                                                 {item.cost_Price}

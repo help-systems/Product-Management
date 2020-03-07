@@ -18,8 +18,10 @@ class TodoSuppliers extends React.Component {
             supplier:"",       
             modal3: false,
             is_delete:false,
-            is_edit:true,
+            is_edit:false,
             addsituation:false,
+            is_dublicate:false,
+            is_add:false,
             currentEditer:"",
             currentDeleter:"",
             inputNewSupplier:"",
@@ -29,7 +31,9 @@ class TodoSuppliers extends React.Component {
         };
         this.SupplierSearch = this.SupplierSearch.bind(this);
         this.handleSupplierChange = this.handleSupplierChange.bind(this);
+        // this.handleSupplierChangeSingle = this.handleSupplierChangeSingle.bind(this);
         this.saveChange = this.saveChange.bind(this);
+        this.todoSave = this.todoSave.bind(this);
         this.todoAdd = this.todoAdd.bind(this);
     }
 
@@ -65,7 +69,7 @@ class TodoSuppliers extends React.Component {
         })
     }
 
-    handleSupplierChangeSingle(e){
+    handleSupplierChangeSingle =(e) => {
         this.setState({
             currentEditer:e.target.value
         })
@@ -177,7 +181,9 @@ class TodoSuppliers extends React.Component {
             supplierobject,
             modal3: !this.state.modal3,
             currentEDitSupplier,
-            is_delete:false
+            is_delete:false,
+            addsituation:true
+
         });
     }
 
@@ -192,18 +198,22 @@ class TodoSuppliers extends React.Component {
             supplierobj,
             modal3: !this.state.modal3,
             currentEDitSupplier,
-            is_delete:false
+            is_delete:false,
+            inputNewSupplier:""
         });
     }
     
    async saveChange() {
+
         let settings;
         let response;
         let url;
+        let supplierobject = this.state.supplierobject;
+        let supplierobj = this.state.supplierobj;
+        let currentDeleter = this.state.currentDeleter;
+        let is_dublicate = this.state.is_dublicate;
 
-        if(this.state.is_delete){
-            let supplierobject = this.state.supplierobject;
-            let currentDeleter = this.state.currentDeleter;
+        if(this.state.is_delete){           
 
             url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;
 			settings = {
@@ -228,12 +238,6 @@ class TodoSuppliers extends React.Component {
                 }
             })
 
-            // let supplierobj = this.state.supplierobj;
-
-            // if(this.state.is_searchsupplier){
-            //     supplierobj.company_Name = this.state.currentEditer
-            // }
-
             this.setState({
                 is_delete:false,
                 is_searchsupplier:false,
@@ -242,17 +246,16 @@ class TodoSuppliers extends React.Component {
                 supplierobj:{},
                 currentDeleter:""
             });
+
         }else if(this.state.is_edit) {
+
             let suppobj = [
                 {
                     company_Name: this.state.currentEDitSupplier.name
                 },
                 {
                     company_Name:this.state.currentEditer
-                }]
-
-                console.log(suppobj);
-
+                }];
             url = this.state.base_url + 'Suppliers';
 			settings = {
 				method: "PUT",
@@ -270,75 +273,107 @@ class TodoSuppliers extends React.Component {
 			
             response = await fetch(url,settings);
 
-        }
+            supplierobject.map(item => {
 
-        let supplierobject = this.state.supplierobject;
-        supplierobject.map(item => {
-            if(item.index !== this.state.currentEDitSupplier.index){
+                if(item.index !== this.state.currentEDitSupplier.index){
+                    return item;
+                }
+                if(this.state.currentEditer.trim() === ""){
+                    item.company_Name = this.state.currentEDitSupplier.name;
+                }else {
+                    item.company_Name = this.state.currentEditer;
+                }           
                 return item;
+            })
+            
+           
+    
+            if(this.state.is_searchsupplier){
+                supplierobj.company_Name = this.state.currentEditer
             }
-            if(this.state.currentEditer.trim() === ""){
-                item.company_Name = this.state.currentEDitSupplier.name;
-            }else {
-                item.company_Name = this.state.currentEditer;
-            }           
-            return item;
-        })
-        
-        let supplierobj = this.state.supplierobj;
 
-        if(this.state.is_searchsupplier){
-            supplierobj.company_Name = this.state.currentEditer
+        }else if(this.state.is_add){
+
+            console.log(this.state.inputNewSupplier)
+            console.log( this.state.inputNewSupplier)
+            
+            let newsupplier = {company_Name: this.state.inputNewSupplier}    
+            let url = this.state.base_url + 'Suppliers';
+            let settings = {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': true,
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+                    'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
+                },
+                body: JSON.stringify (newsupplier)
+            };                    
+            let response = await fetch(url,settings);
+            newsupplier.edit = false;
+            newsupplier.index = 1;  
+            console.log( newsupplier);
+            supplierobject.unshift(newsupplier); 
+            console.log(supplierobject)
+
+            this.setState({                    
+                addsituation:false,
+                is_dublicate,
+                inputNewSupplier:"",
+                supplierobject
+            })            
         }
+        
 
         this.setState({
             modal3: !this.state.modal3,
             supplierobject,
             supplierobj,
-            is_edit:false
+            is_edit:false,
+            is_add:false,
+            is_dublicate:false,
+            currentEditer:"",
+            currentEDitSupplier:{name:"",index:""}
         });
     }
 
     plus = () => {
         this.setState({
-            addsituation:true
+            addsituation:true,
+            is_dublicate:false
         })
     }
 
     minus = () => {
         this.setState({
             addsituation:false,
-            inputNewSupplier:""
+            inputNewSupplier:"",
+            is_dublicate:false
         })
     }
+
     async todoAdd () {
 
-        if(this.state.inputNewSupplier.trim() !== ""){
-
-            // let url = this.state.base_url + `Search/Search/${JSON.stringify ()}`;
-            // 	let settings = {
-            // 		method: "POST",
-            // 		headers: {
-            // 			Accept: 'application/json',
-            // 			'Content-Type': 'application/json',
-
-            // 			'Access-Control-Allow-Origin': '*',
-            // 			'Access-Control-Allow-Credentials': true,
-            // 			'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
-            // 			'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
-            // 		},
-            // 		body: `${}`
-            // 	};
-                
-            // 	let response = await fetch(url,settings);
-            // 	let maindata = await response.json();
-
-        }
-
-        
-        this.setState({
-            addsituation:true
+        let is_dublicate = this.state.is_dublicate;
+        let supplierobject = this.state.supplierobject;
+        is_dublicate = supplierobject.some(item => {
+            return item.company_Name === this.state.inputNewSupplier;
         })
+        if(!is_dublicate && this.state.inputNewSupplier.trim() !== ""){
+            this.setState({
+                modal3: !this.state.modal3,
+                is_add:true,
+                is_dublicate           
+            }); 
+        }else {
+            this.setState({
+                addsituation:true,
+                is_dublicate:true
+            })
+        }
     }
 
     toggle = e => () => {
@@ -362,43 +397,51 @@ class TodoSuppliers extends React.Component {
                 <div id="table" className="table-editable">
                     {
                         this.state.addsituation ?
-                        <div>
-                        <span className="table-add float-right mb-3 mr-2">
-                            <a href="#" className="text-success">
-                            <FaMinus className = "minus" onClick = {this.minus}/>
-                            </a>
-                         </span>
-                        <table className="table table-bordered table-responsive-md table-striped text-center">
-                            <thead>
-                                <tr>
-                                    <th className="text-center">New Supplier Name</th>
-                                </tr>
-                            </thead>
-                            <tbody className = "mainlisthov">
-                                <tr>
-                                    <td>
-                                        <input 
-                                        type="text" 
-                                        onChange = {(e)=> {this.handleInputNewSupplier(e)}}
-                                        value = {this.state.inputNewSupplier}
-                                        />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div>
-                            <button onClick = {this.todoAdd}>ADD</button>
-                        </div>
+
+                        <div id = "addnewvalues">
+                            <div id = "FaMinus">
+                                <span className="table-add float-right mb-3 mr-2">
+                                    <a href="#" className="text-success">
+                                    <FaMinus className = "minus" onClick = {this.minus}/>
+                                    </a>
+                                </span>
+                            </div>
+                            <div className="form-group">
+                                <label for="inputPassword5">Supplier</label>
+                                <input 
+                                    type="text" 
+                                    id="inputPassword5" 
+                                    className="form-control" 
+                                    aria-describedby="passwordHelpBlock"
+                                    onChange = {(e)=> {this.handleInputNewSupplier(e)}}
+                                    value = {this.state.inputNewSupplier}
+                                    placeholder = "Supplier"
+                                /> 
+                            </div>
+                            {
+                                this.state.is_dublicate ?
+                                <small id="passwordHelpBlock" className="form-text text-muted is_duplicate">
+                                    The Supplier name already exists!
+                                </small>
+                                :
+                                ""
+                            }
+                            <div>
+                                <MDBBtn 
+                                    color="primary" 
+                                    onClick={this.todoAdd}
+                                    >
+                                        ADD
+                                </MDBBtn> 
+                            </div>                         
                         </div>
                         :
                         <span className="table-add float-right mb-3 mr-2">
                             <a href="#" className="text-success">
                             <FaPlus onClick = {this.plus}/>
                             </a>
-                         </span>
-
-                    }
-                    
+                        </span>
+                    }                    
                     {
                         this.state.is_searchsupplier ?
 

@@ -133,29 +133,53 @@ padding-right: 13px;
     font-size: 19px;
     margin-right: 6px;
 }
+
 .edited {
     border:none;
 }
+
 .pt-3-half {
     padding-top: 1.4rem;
 }
+
 .text-success {
     font-size: 26px !important;
 }
+
 .editicon {
     font-size: 18px;
     padding: 0 3px 3px 0;
 }
+
 .deleteicon {
     font-size: 19px;
     padding: 0 3px 3px 0;
 }
+
 .deletebutton {
     background: #c75858 !important;
 }
+
 .repeatsupp{
     border: 1px solid red;
 }
-.minus {
+
+.minus,.is_duplicate {
     color: red !important;
+}
+
+#FaMinus::after { 
+    content: "";
+    display: block; 
+    clear: both;
+}
+
+.form-group {
+    color: #2a2a2a;
+    text-align: start;
+    font-size: 15px;
+}
+
+#addnewvalues {
+    margin-bottom: 30px;
 }
