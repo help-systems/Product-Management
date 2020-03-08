@@ -49,7 +49,7 @@ class TodoCategories extends React.Component {
         let categoryobject = await response.json();
         // let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"wine",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
         categoryobject.map(item => {
-            if(item.parent_Category === null) {
+            if(item.parent_Category === null || item.parent_Category === "null") {
                 item.parent_Category = "-";
             }
             for (let i = 0; i < categoryobject.length; i++) {
@@ -129,8 +129,13 @@ class TodoCategories extends React.Component {
                     is_wrongcategory:true,
                 });
             }else {
+                
                 categoryobj = categoryobj[0];
                 categoryobj.edit = false;
+
+                if(categoryobj.parent_Category === null || categoryobj.parent_Category === "null") {
+                    categoryobj.parent_Category = "-";
+                }
 
                 this.setState({
                     categoryobj,
@@ -366,7 +371,9 @@ class TodoCategories extends React.Component {
 
         }else if (this.state.is_add){
 
-            let newcategory = {category_Name: this.state.inputNewCategory,parent_Category:this.state.selectParentCategory}    
+            let selectparent = this.state.selectParentCategory; 
+
+            let newcategory = {category_Name: this.state.inputNewCategory,parent_Category:selectparent}    
             url = this.state.base_url + 'Categories';
             settings = {
                 method: "POST",
@@ -385,6 +392,7 @@ class TodoCategories extends React.Component {
 
             if(newcategory.parent_Category === "null"){
                 newcategory.parent_Category = "-";
+                console.log("Drastamat");
             }
             newcategory.edit = false;
             newcategory.index = 0;

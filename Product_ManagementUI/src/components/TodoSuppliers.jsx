@@ -55,6 +55,24 @@ class TodoSuppliers extends React.Component {
         })
     }
 
+    async componentDidUpdate() {
+
+        let url =this.state.base_url + `Suppliers/`;			
+        let response = await fetch(url);
+        let supplierobject = await response.json();
+        // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
+       
+        supplierobject.map(item => {
+            item.edit = false;
+            item.index = supplierobject.indexOf(item) + 1;
+            return item;
+        })
+        this.setState({
+            supplierobject
+        })
+
+    }
+
     handleInputSupplier = (e) => {
 		this.setState({
 		  supplier:e.target.value
@@ -102,7 +120,7 @@ class TodoSuppliers extends React.Component {
                 supplierobj.edit = false;
 
                 this.setState({
-                    supplierobj:{},
+                    supplierobj,
                     is_wrongsupplier:false,
                     supplier:"",
                     is_searchsupplier:true,
@@ -334,13 +352,13 @@ class TodoSuppliers extends React.Component {
                 body: JSON.stringify (newsupplier)
             };                    
             let response = await fetch(url,settings);
-            newsupplier.edit = false;
-            newsupplier.index = 0;  
-            supplierobject.unshift(newsupplier); 
-            supplierobject.map(item => {
-                item.index++;
-                return item;
-            })
+            // newsupplier.edit = false;
+            // newsupplier.index = 0;  
+            // supplierobject.unshift(newsupplier); 
+            // supplierobject.map(item => {
+            //     item.index++;
+            //     return item;
+            // })
 
             this.setState({                    
                 addsituation:false,
@@ -413,6 +431,7 @@ class TodoSuppliers extends React.Component {
                     <input 
                         type="text" 
                         placeholder = "Supplier"
+                        value = {this.state.supplier}
                         onChange = {this.handleInputSupplier}
                         />
                     <button onClick = {this.SupplierSearch}>Search</button>                    
