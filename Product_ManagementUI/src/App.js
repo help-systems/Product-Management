@@ -37,8 +37,6 @@ class App extends React.Component {
 				:
 				pagelists[i] = false			
 		}
-		
-		
 
 		if(pagelists[3]) {
 
@@ -99,13 +97,17 @@ class App extends React.Component {
 	async MainSearch(){
 
 		let mainobject = this.state.mainobject;
+		console.log(mainobject)
+
 		
-		if(mainobject.Barcode==="") {mainobject.Barcode="null"}
-		if(mainobject.Product_Name==="") {mainobject.Product_Name="null"}
-		if(mainobject.Category_Name==="") {mainobject.Category_Name="null"}
-		if(mainobject.Supplier_Name==="") {mainobject.Supplier_Name="null"}
+		
 	
 		if(mainobject.BW_Name !==""){
+			if(mainobject.Barcode==="") {mainobject.Barcode="null"}
+			if(mainobject.Product_Name==="") {mainobject.Product_Name="null"}
+			if(mainobject.Category_Name==="") {mainobject.Category_Name="null"}
+			if(mainobject.Supplier_Name==="") {mainobject.Supplier_Name="null"}
+			
 			let url = this.state.base_url + `Search/Search/${JSON.stringify (mainobject)}`;
 			let settings = {
 				method: "POST",
@@ -120,28 +122,24 @@ class App extends React.Component {
 				},
 				body: `${mainobject}`
 			};
-			
+			if(mainobject.Barcode==="null") {mainobject.Barcode=""}
+			if(mainobject.Product_Name==="null") {mainobject.Product_Name=""}
+			if(mainobject.Category_Name==="null") {mainobject.Category_Name=""}
+			if(mainobject.Supplier_Name==="null") {mainobject.Supplier_Name=""}
 			let response = await fetch(url,settings);
 			let maindata = await response.json();
 
 			this.setState({
 				maindata,
-				BW_Name_error:false
+				BW_Name_error:false,
+				mainobject
 			})
 				
 		}else {
 			this.setState({
 				BW_Name_error:true
 			})
-		}
-		
-
-		this.setState({
-			mainobject
-		})
-
-		
-		
+		}		
 	}
 
 	handleBW_Name = (e) => {
@@ -154,6 +152,7 @@ class App extends React.Component {
 
 
 	render(){
+		console.log(this.state.mainobject)
 
 		let pagelists = this.state.pagelists;
 		// console.log(pagelists[0])

@@ -1,34 +1,40 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaFilter } from 'react-icons/fa';
+import '@fortawesome/fontawesome-free/css/all.min.css'; 
+import 'bootstrap-css-only/css/bootstrap.min.css'; 
+import 'mdbreact/dist/css/mdb.css';
 
 class TodoMain extends React.Component {
     render() {
         let i = 0;      
-        return(
-            
+        return(            
             <div id="main">
-                <div className="radio">
-                    <label>
+                <div className="radio form-check-inline">
+                    <div className="form-check form-check-inline">                       
                         <input 
                             type="radio" 
                             value="W" 
                             name = "BW_Name"
+                            className="form-check-input" 
+                            id="materialInline1"
                             checked={this.props.mainobject.BW_Name === "W"} 
                             onChange={this.props.handleBW_Name}
                         />
-                        Warehouse
-                    </label>
-                    <label>
+                        <label className="form-check-label" htmlFor="materialInline1">Warehouse</label>             
+                    </div>
+                    <div className="form-check form-check-inline">                        
                         <input 
                             type="radio" 
                             value="B" 
-                            name = "BW_Name"                                
+                            name = "BW_Name" 
+                            className="form-check-input" 
+                            id="materialInline2"                               
                             checked={this.props.mainobject.BW_Name === "B"}  
                             onChange={this.props.handleBW_Name}
                         />
-                        Branch
-                    </label>
+                        <label className="form-check-label" htmlFor="materialInline2">Branch</label>
+                    </div>                    
                 </div>
                 <div>
                     {

@@ -44,21 +44,19 @@ class TodoCategories extends React.Component {
 
     async componentDidMount() {
 
-        let url =this.state.base_url + `Categories/Get/`;			
+        let url =this.state.base_url + `Categories/`;			
         let response = await fetch(url);
         let categoryobject = await response.json();
         // let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"koko",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
-        let i = 1;
         categoryobject.map(item => {
             if(item.parent_Category === null) {
                 item.parent_Category = "-";
             }
             item.edit = false;
-            item.index = i;
-            i++
+            item.index = categoryobject.indexOf(item) + 1;
             return item;
         })
-        console.log(categoryobject)
+
         this.setState({
             categoryobject
         })
@@ -107,11 +105,12 @@ class TodoCategories extends React.Component {
     
     async CategorySearch(){    
 
-        let url = this.state.base_url + `Category/GetByName/${this.state.category}`;//poxel
+        let url = this.state.base_url + `Categories/${this.state.category}`;
         
         let response = await fetch(url);
-        let categoryobj = await response.json();        
-        categoryobj = categoryobj[0];
+        let categoryobj = await response.json();  
+        let categoryobj= this.state.categoryobject[0];        
+        console.log(categoryobj);
 
         if(!categoryobj){
             this.setState({
@@ -121,14 +120,13 @@ class TodoCategories extends React.Component {
                 is_wrongcategory:true,
             });
         }else {
-            let categoryobj = this.state.categoryobject[0];
-            console.log(categoryobj);
+            categoryobj = categoryobj[0];
             categoryobj.edit = false;
 
             this.setState({
-                categoryobj:{},
-                is_wrongcategory:false,
+                categoryobj,
                 category:"",
+                is_wrongcategory:false,
                 is_searchcategory:true,
                 is_dublicate:false
             })	
@@ -270,7 +268,7 @@ class TodoCategories extends React.Component {
             
             let currentDeleter = this.state.currentDeleter;
 
-            url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;///poxel
+            url = this.state.base_url + `Categories/${currentDeleter}`;
 			settings = {
 				method: "DELETE",
 				headers: {
@@ -292,13 +290,7 @@ class TodoCategories extends React.Component {
                     return item;
                 }
             })
-            console.log(categoryobject)
-
-            // let categoryobj = this.state.categoryobj;
-
-            // if(this.state.is_searchcategory){
-            //     categoryobj.company_Name = this.state.currentCategory
-            // }
+            console.log(categoryobject)  
 
             this.setState({
                 is_delete:false,
@@ -311,7 +303,7 @@ class TodoCategories extends React.Component {
 
         }else if(this.state.is_edit) {
 
-            let suppobj = [
+            let editablecategory = [
                 {
                     company_Name: this.state.currentEDitCategory.name
                 },
@@ -319,9 +311,9 @@ class TodoCategories extends React.Component {
                     company_Name:this.state.currentCategory
                 }]
 
-                console.log(suppobj);
+                console.log(editablecategory);
 
-            url = this.state.base_url + 'Suppliers';
+            url = this.state.base_url + 'Categories';
 			settings = {
 				method: "PUT",
 				headers: {
@@ -333,7 +325,7 @@ class TodoCategories extends React.Component {
 					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
 					'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
 				},
-				body: JSON.stringify(suppobj)
+				body: JSON.stringify(editablecategory)
 			};
 			
             response = await fetch(url,settings);
@@ -358,7 +350,7 @@ class TodoCategories extends React.Component {
         }else if (this.state.is_add){
 
             let newcategory = {category_Name: this.state.inputNewCategory,parent_Category:this.state.selectParentCategory}    
-            url = this.state.base_url + 'Suppliers';
+            url = this.state.base_url + 'Categories';
             settings = {
                 method: "POST",
                 headers: {
@@ -377,14 +369,15 @@ class TodoCategories extends React.Component {
             if(newcategory.parent_Category === "null"){
                 newcategory.parent_Category = "-";
             }
-
             newcategory.edit = false;
-            newcategory.index = 1;  
-            console.log( newcategory);
+            newcategory.index = 0;
             categoryobject.unshift(newcategory); 
-            console.log(categoryobject)
+            categoryobject.map(item => {
+                item.index++;
+                return item;
+            })
 
-            this.setState({                    
+            this.setState({
                 addsituation:false,
                 is_dublicate,
                 categoryobject
@@ -487,6 +480,7 @@ class TodoCategories extends React.Component {
                 <input 
                     type="text" 
                     placeholder = "Category"
+                    value = {this.state.category}
                     onChange = {this.handleInputCategory}
                 />
                 <button onClick = {this.CategorySearch}>Search</button>

@@ -44,11 +44,10 @@ class TodoSuppliers extends React.Component {
         let response = await fetch(url);
         let supplierobject = await response.json();
         // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
-        let i = 1;
+       
         supplierobject.map(item => {
             item.edit = false;
-            item.index = i;
-            i++
+            item.index = supplierobject.indexOf(item) + 1;
             return item;
         })
         this.setState({
@@ -229,7 +228,7 @@ class TodoSuppliers extends React.Component {
 
         if(this.state.is_delete){           
 
-            url = this.state.base_url + `Suppliers?company_Name=${currentDeleter}`;
+            url = this.state.base_url + `Suppliers/${currentDeleter}`;
 			settings = {
 				method: "DELETE",
 				headers: {
@@ -328,10 +327,12 @@ class TodoSuppliers extends React.Component {
             };                    
             let response = await fetch(url,settings);
             newsupplier.edit = false;
-            newsupplier.index = 1;  
-            console.log( newsupplier);
+            newsupplier.index = 0;  
             supplierobject.unshift(newsupplier); 
-            console.log(supplierobject)
+            supplierobject.map(item => {
+                item.index++;
+                return item;
+            })
 
             this.setState({                    
                 addsituation:false,

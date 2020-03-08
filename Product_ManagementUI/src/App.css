@@ -113,13 +113,15 @@ body {
 }
 
 .radio {
+    display: flex !important;
+    justify-content: space-around;
     padding-top: 38px;
-    font-size: 16px;
-    color: black;
+    font-size: 19px;
+    color: rgb(33, 67, 112);
 }
   
 .radio label {
-padding-right: 13px;
+padding-left: 6px;
 }
 
 .BW_Name_error {
