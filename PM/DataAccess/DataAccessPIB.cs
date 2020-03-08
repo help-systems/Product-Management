@@ -48,7 +48,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
             }
             return pib;
         }
-         public void InsertProductInBranch(ProductsInBranches pib)
+        public void InsertProductInBranch(ProductsInBranches pib)
         {
             rowsAffected = 0;
             // table Products_in_Branches
