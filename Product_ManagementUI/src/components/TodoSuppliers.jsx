@@ -83,7 +83,7 @@ class TodoSuppliers extends React.Component {
 
     async SupplierSearch(){  
 
-        if(this.state.supplier.trimn() !== ""){
+        if(this.state.supplier.trim() !== ""){
             let url = this.state.base_url + `Suppliers/${this.state.supplier}`;
             
             let response = await fetch(url);

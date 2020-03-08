@@ -44,10 +44,10 @@ class TodoCategories extends React.Component {
 
     async componentDidMount() {
 
-        // let url =this.state.base_url + `Categories/`;			
-        // let response = await fetch(url);
-        // let categoryobject = await response.json();
-        let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"wine",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
+        let url =this.state.base_url + `Categories/`;			
+        let response = await fetch(url);
+        let categoryobject = await response.json();
+        // let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"wine",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
         categoryobject.map(item => {
             if(item.parent_Category === null) {
                 item.parent_Category = "-";
