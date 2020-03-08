@@ -44,14 +44,22 @@ class TodoCategories extends React.Component {
 
     async componentDidMount() {
 
-        let url =this.state.base_url + `Categories/`;			
-        let response = await fetch(url);
-        let categoryobject = await response.json();
-        // let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"koko",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
+        // let url =this.state.base_url + `Categories/`;			
+        // let response = await fetch(url);
+        // let categoryobject = await response.json();
+        let categoryobject = [{parent_Category:null,category_Name:"wine"},{parent_Category:"wine",category_Name:"aaa"},{parent_Category:"sfsfsf",category_Name:"bbb"},{parent_Category:"BBBBBB",category_Name:"ccc"}]
         categoryobject.map(item => {
             if(item.parent_Category === null) {
                 item.parent_Category = "-";
             }
+            for (let i = 0; i < categoryobject.length; i++) {
+                if(item.category_Name === categoryobject[i].parent_Category){
+                    item.is_editable = false;
+                    break;
+                }
+                item.is_editable = true;
+            }
+
             item.edit = false;
             item.index = categoryobject.indexOf(item) + 1;
             return item;
@@ -104,33 +112,42 @@ class TodoCategories extends React.Component {
     }
     
     async CategorySearch(){    
-
-        let url = this.state.base_url + `Categories/${this.state.category}`;
         
-        let response = await fetch(url);
-        let categoryobj = await response.json();  
-        // let categoryobj= this.state.categoryobject[0];        
-        console.log(categoryobj);
+        if(this.state.category.trim()!==""){
+            let url = this.state.base_url + `Categories/${this.state.category}`;
+            
+            let response = await fetch(url);
+            let categoryobj = await response.json();  
+            // let categoryobj= this.state.categoryobject[0];        
+            console.log(categoryobj);
 
-        if(!categoryobj){
+            if(!categoryobj){
+                this.setState({
+                    categoryobj:{},
+                    is_searchcategory:false,
+                    is_dublicate:false,
+                    is_wrongcategory:true,
+                });
+            }else {
+                categoryobj = categoryobj[0];
+                categoryobj.edit = false;
+
+                this.setState({
+                    categoryobj,
+                    category:"",
+                    is_wrongcategory:false,
+                    is_searchcategory:true,
+                    is_dublicate:false
+                })	
+            }	
+        }
+        else{
             this.setState({
                 categoryobj:{},
                 is_searchcategory:false,
-                is_dublicate:false,
-                is_wrongcategory:true,
-            });
-        }else {
-            categoryobj = categoryobj[0];
-            categoryobj.edit = false;
-
-            this.setState({
-                categoryobj,
-                category:"",
-                is_wrongcategory:false,
-                is_searchcategory:true,
                 is_dublicate:false
-            })	
-        }		
+            });
+        }	
     }
 
     todoSave(index,e) {
@@ -309,7 +326,7 @@ class TodoCategories extends React.Component {
                 },
                 {
                     company_Name:this.state.currentCategory
-                }]
+                }];
 
                 console.log(editablecategory);
 
@@ -372,8 +389,16 @@ class TodoCategories extends React.Component {
             newcategory.edit = false;
             newcategory.index = 0;
             categoryobject.unshift(newcategory); 
+           
             categoryobject.map(item => {
                 item.index++;
+                for (let i = 0; i < categoryobject.length; i++) {
+                    if(item.category_Name === categoryobject[i].parent_Category){
+                        item.is_editable = false;
+                        break;
+                    }
+                    item.is_editable = true;
+                }
                 return item;
             })
 
@@ -411,7 +436,7 @@ class TodoCategories extends React.Component {
 
     plus = () => {
         let categoryobject = this.state.categoryobject;
-        let parentCategories = [...new Set(categoryobject.map(item => item.parent_Category))];
+        let parentCategories = [...new Set(categoryobject.map(item => item.category_Name))];
         console.log(parentCategories)
         parentCategories = parentCategories.filter(item => {
             return item !== "-";
@@ -473,18 +498,18 @@ class TodoCategories extends React.Component {
         let i = 0;
         return(
             <div id="main" className="card-body card">
-            <div className = "search" id = "maininfo">
-                <div>
-                    <FaFilter/>
+                <div className = "search" id = "maininfo">
+                    <div>
+                        <FaFilter/>
+                    </div>
+                    <input 
+                        type="text" 
+                        placeholder = "Category"
+                        value = {this.state.category}
+                        onChange = {this.handleInputCategory}
+                    />
+                    <button onClick = {this.CategorySearch}>Search</button>
                 </div>
-                <input 
-                    type="text" 
-                    placeholder = "Category"
-                    value = {this.state.category}
-                    onChange = {this.handleInputCategory}
-                />
-                <button onClick = {this.CategorySearch}>Search</button>
-            </div>
             {
                 this.state.is_wrongcategory ?
                     <small id="passwordHelpBlock" className="form-text text-muted is_duplicate">
@@ -579,26 +604,15 @@ class TodoCategories extends React.Component {
                         <td>
                             #
                         </td>
-                        {
-                            !this.state.categoryobj.edit ? 
-                            <>
-                            <td className="pt-3-half">
-                                {this.state.categoryobj.parent_Category}
-                            </td> 
+                        <td className="pt-3-half">
+                            {this.state.categoryobj.parent_Category}
+                        </td> 
+                        { !this.state.categoryobj.edit ? 
                             <td className="pt-3-half">
                                 {this.state.categoryobj.category_Name}
-                            </td> 
-                            </>
+                            </td>                             
                             :
-                            <>
-                            <td className="pt-3-half" >
-                                <input 
-                                    type="text" 
-                                    value =  {this.state.currentParentCategory} 
-                                    className="edited" 
-                                    onChange = {(e) => {this.handleParentCategoryChangeSingle(e)}}  
-                                />
-                            </td>
+                            
                             <td className="pt-3-half" >
                             {
                                 this.state.is_repeatcategory ?
@@ -609,17 +623,15 @@ class TodoCategories extends React.Component {
                                     onChange = {(e) => {this.handleCategoryChangeSingle(e)}}  
 
                                 />
-                            :
+                                :
                                 <input 
                                     type="text" 
                                     value =  {this.state.currentCategory} 
                                     className="edited" 
                                     onChange = {(e) => {this.handleCategoryChangeSingle(e)}}  
-                                    />
+                                />
                             }
-                            
-                        </td>
-                        </>
+                            </td>
                         }
                         {
                             !this.state.categoryobj.edit ? 
@@ -684,7 +696,7 @@ class TodoCategories extends React.Component {
                 :          
 
                 this.state.categoryobject.length > 0 ?
-                   <table key = "allcategory " className="table table-bordered table-responsive-md table-striped text-center">                        
+                <table key = "allcategory " className="table table-bordered table-responsive-md table-striped text-center">                        
                     <thead>
                         <tr>
                             <th className="text-center">#</th>
@@ -697,54 +709,44 @@ class TodoCategories extends React.Component {
                     <tbody key = "allcategory_body" className = "mainlisthov">
                     { 
                         this.state.categoryobject.map(item=>{
-                           
+                        
                             return (
                                 <tr key={item.index} >
                                     <td>
                                         {item.index}
                                     </td>
-                                    {
-                                        !item.edit ? 
-                                        <>
-                                            <td className="pt-3-half">
-                                                {item.parent_Category}
-                                            </td> 
-                                            <td className="pt-3-half">
-                                                {item.category_Name}
-                                            </td> 
-                                        </>
-                                        :
-                                        <>
-                                            <td className="pt-3-half" >                                           
+                                        <td className="pt-3-half">
+                                            {item.parent_Category}
+                                        </td> 
+                                        {!item.edit ? 
+                                        <td className="pt-3-half">
+                                            {item.category_Name}
+                                        </td> 
+                                       
+                                        : 
+                                        <td className="pt-3-half" >
+                                        {
+                                            this.state.is_repeatcategory ?
                                                 <input 
                                                     type="text" 
-                                                    value =  {this.state.currentParentCategory} 
-                                                    className="edited" 
-                                                    onChange = {(e) => {this.handleParentCategoryChange(item.index,e)}}  
-                                                />                                         
-                                            </td>
-                                            <td className="pt-3-half" >
-                                            {
-                                                this.state.is_repeatcategory ?
-                                                    <input 
-                                                        type="text" 
-                                                        value =  {this.state.currentCategory} 
-                                                        className="edited repeatsupp" 
-                                                        onChange = {(e) => {this.handleCategoryChange(item.index,e)}}  
+                                                    value =  {this.state.currentCategory} 
+                                                    className="edited repeatsupp" 
+                                                    onChange = {(e) => {this.handleCategoryChange(item.index,e)}}  
 
-                                                    />
-                                            :
-                                                    <input 
-                                                        type="text" 
-                                                        value =  {this.state.currentCategory} 
-                                                        className="edited" 
-                                                        onChange = {(e) => {this.handleCategoryChange(item.index,e)}}  
-                                                    />
-                                            }
-                                            </td>
-                                        </>
+                                                />
+                                        :
+                                                <input 
+                                                    type="text" 
+                                                    value =  {this.state.currentCategory} 
+                                                    className="edited" 
+                                                    onChange = {(e) => {this.handleCategoryChange(item.index,e)}}  
+                                                />
+                                        }
+                                        </td>
+                                    
                                     }
                                     {
+                                        item.is_editable ?
                                         !item.edit ? 
                                         <td>
                                             <MDBBtn  color="primary" onClick ={(e) => {this.todoEdit(item.category_Name,item.parent_Category)}} >
@@ -760,44 +762,64 @@ class TodoCategories extends React.Component {
                                                 Save
                                             </MDBBtn>
                                         </td>
-                                    }
-                                    <td>
-                                        <MDBContainer>
-                                            <MDBBtn  
-                                                className = "deletebutton"
-                                                color="primary" 
-                                                onClick={(e)=>{
-                                                    this.todoDelete(item.category_Name);
-                                                }}
-                                            >
-                                                <MdDeleteForever className = "deleteicon"/>
-                                                Delete
+                                        
+                                        :
+
+                                        <td>
+                                            <MDBBtn  color="primary">
+                                                <FaEdit className="editicon"/>
+                                                Not Editable
                                             </MDBBtn>
-                                            <MDBModal isOpen={this.state.modal3} toggle={this.toggle(3)} size="sm">
-                                                <MDBModalHeader toggle={this.toggle(3)}>Are you sure?</MDBModalHeader>
-                                                <MDBModalBody>
-                                                </MDBModalBody>
-                                                <MDBModalFooter>
-                                                    <MDBBtn 
-                                                        color="secondary" 
-                                                        size="sm" 
-                                                        onClick={() => {
-                                                            this.cancelChange();                                                                
-                                                        }}
-                                                    >
-                                                        Close
-                                                    </MDBBtn>
-                                                    <MDBBtn 
-                                                        color="primary" 
-                                                        size="sm" 
-                                                        onClick={this.saveChange}
-                                                    >
-                                                        Save Changes
-                                                    </MDBBtn>
-                                                </MDBModalFooter>
-                                            </MDBModal>
-                                        </MDBContainer>
-                                    </td>
+                                        </td>
+                                        
+                                    }
+                                    {
+                                        item.is_editable ?
+                                        <td>
+                                            <MDBContainer>
+                                                <MDBBtn  
+                                                    className = "deletebutton"
+                                                    color="primary" 
+                                                    onClick={(e)=>{
+                                                        this.todoDelete(item.category_Name);
+                                                    }}
+                                                >
+                                                    <MdDeleteForever className = "deleteicon"/>
+                                                    Delete
+                                                </MDBBtn>
+                                                <MDBModal isOpen={this.state.modal3} toggle={this.toggle(3)} size="sm">
+                                                    <MDBModalHeader toggle={this.toggle(3)}>Are you sure?</MDBModalHeader>
+                                                    <MDBModalBody>
+                                                    </MDBModalBody>
+                                                    <MDBModalFooter>
+                                                        <MDBBtn 
+                                                            color="secondary" 
+                                                            size="sm" 
+                                                            onClick={() => {
+                                                                this.cancelChange();                                                                
+                                                            }}
+                                                        >
+                                                            Close
+                                                        </MDBBtn>
+                                                        <MDBBtn 
+                                                            color="primary" 
+                                                            size="sm" 
+                                                            onClick={this.saveChange}
+                                                        >
+                                                            Save Changes
+                                                        </MDBBtn>
+                                                    </MDBModalFooter>
+                                                </MDBModal>
+                                            </MDBContainer>
+                                        </td>
+                                        :
+                                        <td>
+                                            <MDBBtn  color="primary" className = "deletebutton">
+                                                <FaEdit className="editicon"/>
+                                                Not Deletable
+                                            </MDBBtn>
+                                        </td>
+                                    }
                                 </tr>
                             );
                         })

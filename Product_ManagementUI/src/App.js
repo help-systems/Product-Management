@@ -38,17 +38,6 @@ class App extends React.Component {
 				pagelists[i] = false			
 		}
 
-		if(pagelists[3]) {
-
-			let url = this.state.base_url + `Products/GetProducts/`;			
-			let response = await fetch(url);
-			let productobject = await response.json();
-			this.setState({
-				productobject
-			})
-
-		}
-
 		this.setState({
 			pagelists
 		})

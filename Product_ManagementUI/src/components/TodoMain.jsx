@@ -83,61 +83,61 @@ class TodoMain extends React.Component {
                 </div>
                 <div>                   
                     
-                        {this.props.maindata.length > 0 ?
-                            <table  className="table table-dark">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Barcode</th>
-                                    <th scope="col">Product Name</th>
-                                    <th scope="col">Supplier Name</th>
-                                    <th scope="col">Btranch / Warehouse Name</th>
-                                    <th scope="col">Cost Price</th>
-                                    <th scope="col">Selling Price</th>
-                                    <th scope="col">Category Name</th>
-                                    <th scope="col">Count</th>
+                {this.props.maindata.length > 0 ?
+                    <table  className="table table-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col">Barcode</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Supplier Name</th>
+                            <th scope="col">Btranch / Warehouse Name</th>
+                            <th scope="col">Cost Price</th>
+                            <th scope="col">Selling Price</th>
+                            <th scope="col">Category Name</th>
+                            <th scope="col">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody className = "mainlisthov">                        
+                    { this.props.maindata.map(item=>{
+                            console.log(item);
+                            i++
+                            return (
+                                <tr key={i} >                                           
+                                    <td>
+                                        {item.barcode}
+                                    </td>
+                                    <td>
+                                        {item.product_Name}
+                                    </td>
+                                    <td>
+                                        {item.supplier_Name}
+                                    </td>
+                                    <td>
+                                        {item.bW_Name}
+                                    </td>
+                                    <td>
+                                        {item.cost_Price}
+                                    </td>
+                                    <td>
+                                        {item.selling_Price}
+                                    </td>
+                                    <td>
+                                        {item.category_Name}
+                                    </td>
+                                    <td>
+                                        {item.count}
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className = "mainlisthov">                        
-                            { this.props.maindata.map(item=>{
-                                    console.log(item);
-                                    i++
-                                    return (
-                                        <tr key={i} >                                           
-                                            <td>
-                                                {item.barcode}
-                                            </td>
-                                            <td>
-                                                {item.product_Name}
-                                            </td>
-                                            <td>
-                                                {item.supplier_Name}
-                                            </td>
-                                            <td>
-                                                {item.bW_Name}
-                                            </td>
-                                            <td>
-                                                {item.cost_Price}
-                                            </td>
-                                            <td>
-                                                {item.selling_Price}
-                                            </td>
-                                            <td>
-                                                {item.category_Name}
-                                            </td>
-                                            <td>
-                                                {item.count}
-                                            </td>
-                                        </tr>
-                                    );                              
-                                    
-                                })
-                            }
-                            </tbody>
-                            </table>
-                            : 
-                            <div>
-                            </div>
-                            }
+                            );                              
+                            
+                        })
+                    }
+                    </tbody>
+                    </table>
+                    : 
+                    <div>
+                    </div>
+                    }
                      
                 </div>
             </div>
