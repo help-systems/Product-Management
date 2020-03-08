@@ -105,12 +105,11 @@ class TodoCategories extends React.Component {
     
     async CategorySearch(){    
 
-<<<<<<< HEAD
         let url = this.state.base_url + `Categories/${this.state.category}`;
         
         let response = await fetch(url);
         let categoryobj = await response.json();  
-        let categoryobj= this.state.categoryobject[0];        
+        // let categoryobj= this.state.categoryobject[0];        
         console.log(categoryobj);
 
         if(!categoryobj){
@@ -123,50 +122,15 @@ class TodoCategories extends React.Component {
         }else {
             categoryobj = categoryobj[0];
             categoryobj.edit = false;
-=======
-        if(this.state.category.trim()!==""){
-            let url = this.state.base_url + `Categories/${this.state.category}`;
-            
-            let response = await fetch(url);
-            let categoryobj = await response.json();  
-            console.log(categoryobj);
->>>>>>> e0f7252caae192f8cbb0a0f7ea1d00f716453757
 
-            if(!categoryobj){
-                this.setState({
-                    categoryobj:{},
-                    is_searchcategory:false,
-                    is_dublicate:false,
-                    is_wrongcategory:true,
-                });
-            }else {
-                console.log(categoryobj);
-                categoryobj = categoryobj[0];
-                categoryobj.edit = false;
-
-                this.setState({
-                    categoryobj,
-                    is_wrongcategory:false,
-                    category:"",
-                    is_searchcategory:true,
-                    is_dublicate:false
-                })	
-            }	
-        }
-        else{
             this.setState({
-<<<<<<< HEAD
                 categoryobj,
                 category:"",
                 is_wrongcategory:false,
                 is_searchcategory:true,
-=======
-                categoryobj:{},
-                is_searchcategory:false,
->>>>>>> e0f7252caae192f8cbb0a0f7ea1d00f716453757
                 is_dublicate:false
-            });
-        }	
+            })	
+        }		
     }
 
     todoSave(index,e) {
