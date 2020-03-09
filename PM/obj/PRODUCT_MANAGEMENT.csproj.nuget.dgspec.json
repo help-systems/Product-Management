@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Lusine\\Documents\\GitHub\\PM\\PM\\PRODUCT_MANAGEMENT.csproj": {}
+    "C:\\Users\\Lusine\\Desktop\\gitPM\\Product-Management\\PM\\PRODUCT_MANAGEMENT.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Lusine\\Documents\\GitHub\\PM\\PM\\PRODUCT_MANAGEMENT.csproj": {
+    "C:\\Users\\Lusine\\Desktop\\gitPM\\Product-Management\\PM\\PRODUCT_MANAGEMENT.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Lusine\\Documents\\GitHub\\PM\\PM\\PRODUCT_MANAGEMENT.csproj",
+        "projectUniqueName": "C:\\Users\\Lusine\\Desktop\\gitPM\\Product-Management\\PM\\PRODUCT_MANAGEMENT.csproj",
         "projectName": "PRODUCT_MANAGEMENT",
-        "projectPath": "c:\\Users\\Lusine\\Documents\\GitHub\\PM\\PM\\PRODUCT_MANAGEMENT.csproj",
+        "projectPath": "C:\\Users\\Lusine\\Desktop\\gitPM\\Product-Management\\PM\\PRODUCT_MANAGEMENT.csproj",
         "packagesPath": "C:\\Users\\Lusine\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Lusine\\Documents\\GitHub\\PM\\PM\\obj\\",
+        "outputPath": "C:\\Users\\Lusine\\Desktop\\gitPM\\Product-Management\\PM\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Lusine\\AppData\\Roaming\\NuGet\\NuGet.Config",
