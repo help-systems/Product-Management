@@ -6,6 +6,6 @@ namespace PRODUCT_MANAGEMENT.Models
     {
         public string Parent_Category { get; set; }
         public string Category_Name { get; set; }
-
+        public string NewCategoryName { get; set; }
     }
 }

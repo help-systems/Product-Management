@@ -18,6 +18,8 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         {
             rowsAffected = 0;
             List<Suppliers> suppliers = new List<Suppliers>();
+              
+
             DataTable dt = null;
 
             string sql = "SELECT Company_Name FROM Suppliers";
@@ -35,6 +37,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                             suppliers= (from row in dt.AsEnumerable()
                                         select new Suppliers
                                         {
+
                                             Company_Name = row.Field<string>("Company_Name")
                                         }).ToList();
 
@@ -50,28 +53,38 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         }
         
 
-        public void InsertSuppliers(Suppliers suppliers)
+        public Suppliers InsertSuppliers(Suppliers suppliers)
         {
             rowsAffected = 0;
-            string sql = "INSERT INTO [Suppliers]( Company_Name)";
-            sql += $" VALUES(  '{suppliers.Company_Name}')";
+
+            string sql = "INSERT INTO [Suppliers](Company_Name)";
+            sql += $" VALUES('{suppliers.Company_Name}')";
 
             try
             {
                 using (SqlConnection cnn = new SqlConnection(AppSettings.ConnectionString))
                 {
+
                     using (SqlCommand cmd = new SqlCommand(sql, cnn))
                     {
+
                         cmd.CommandType = CommandType.Text;
+
                         cnn.Open();
+
                         rowsAffected = cmd.ExecuteNonQuery();
+
                         ResultText = "Rows Affected: " + rowsAffected.ToString();
                     }
                 }
+
+                return suppliers;
             }
             catch (Exception ex)
             {
                 ResultText = ex.ToString();
+
+                throw (ex);
             }
         }
 
@@ -101,33 +114,28 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         }
 
 
-        public void DeleteSuppliers(string company_name)
+        public string DeleteSuppliers(string company_name)
         {
-            string sql="DELETE FROM [Suppliers] WHERE Company_Name = '{0}'";
-            StringBuilder errorMessages = new StringBuilder();
-            using (SqlConnection connection=new SqlConnection(AppSettings.ConnectionString))
+            try
             {
-                using (SqlCommand command = new SqlCommand(string.Format(sql,company_name),connection))
+                string sql = "DELETE FROM [Suppliers] WHERE Company_Name = '{0}'";
+                StringBuilder errorMessages = new StringBuilder();
+                using (SqlConnection connection = new SqlConnection(AppSettings.ConnectionString))
                 {
-                    try
+                    using (SqlCommand command = new SqlCommand(string.Format(sql, company_name), connection))
                     {
+
                         connection.Open();
                         command.ExecuteNonQuery();
                     }
-                    catch(SqlException ex)
-                    {
-                        for (int i = 0; i < ex.Errors.Count; i++)
-                        {
-                             errorMessages.Append("Index #" + i + "\n" +
-                            "Message: " + ex.Errors[i].Message + "\n" +
-                            "LineNumber: " + ex.Errors[i].LineNumber + "\n" +
-                            "Source: " + ex.Errors[i].Source + "\n" +
-                            "Procedure: " + ex.Errors[i].Procedure + "\n");
-                        }
-                        Console.WriteLine(errorMessages.ToString());
-                    }
                 }
-            }           
+
+                return company_name;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
         }
     }
 }

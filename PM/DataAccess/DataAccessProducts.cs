@@ -12,53 +12,56 @@ namespace PRODUCT_MANAGEMENT.DataAccess
     {
         private int rowsAffected { get; set; }
         public string ResultText { get; set; }
-        
-        public void InsertProduct(Products product)
+
+
+        public Products InsertProduct(Products product)
         {
-            var barcode = product.Barcode;
-            var cost_price = product.Cost_Price;
-            var selling_price = product.Selling_Price;
-            var supplier_name = product.Supplier_Name;
-            var name = product.Name;
-            var category_name = product.Category_Name;
-
-            rowsAffected = 0;
-            string sql = string.Format(
-                "INSERT INTO [Products] ( Barcode, Cost_Price, Selling_Price, Supplier_Name, Name, Category_Name)" +
-                "values ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')", 
-                    barcode, cost_price, selling_price, supplier_name, name, category_name);
-
-
-            using (SqlConnection cnn = new SqlConnection(AppSettings.ConnectionString))
+            try
             {
-                using (SqlDataAdapter da = new SqlDataAdapter(sql, cnn))
-                {
-                    
-                    DataTable dt = new DataTable();
-                    da.Fill(dt);
-                    using (SqlCommandBuilder builder = new SqlCommandBuilder(da))
-                    {
-                         
-                        da.InsertCommand = builder.GetInsertCommand();
-                        rowsAffected = da.Update(dt);
+                var barcode = product.Barcode;
+                var cost_price = product.Cost_Price;
+                var selling_price = product.Selling_Price;
+                var supplier_name = product.Supplier_Name;
+                var name = product.Name;
+                var category_name = product.Category_Name;
 
-                        ResultText = "Rows Affected: " + rowsAffected.ToString();
-                    }
+                string sql = string.Format(
+                    "INSERT INTO [Products] ( Barcode, Cost_Price, Selling_Price, Supplier_Name, Name, Category_Name)" +
+                    "values ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')",
+                        barcode, cost_price, selling_price, supplier_name, name, category_name);
+
+
+                using (SqlConnection connection = new SqlConnection(AppSettings.ConnectionString))
+                {
+                    connection.Open();
+
+
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.Connection = connection;
+
+                        cmd.CommandText = string.Format(
+                            "INSERT INTO [Products] ( Barcode, Cost_Price, Selling_Price, Supplier_Name, Name, Category_Name)" +
+                            "values ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')",
+                                barcode, cost_price, selling_price, supplier_name, name, category_name);
+
+                        cmd.ExecuteNonQuery();
+                    };
                 }
-                
+
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
             }
         }
+
 
         public List<Products> GetProducts()
         {
             rowsAffected = 0;
             List<Products> products = new List<Products>();
-               //     [Barcode]
-                //   ,[Cost_Price]
-                //   ,[Selling_Price]
-                //   ,[Supplier_Name]
-                //   ,[Name]
-                //   ,[Category_Name]
 
             DataTable dt = null;
 
@@ -76,14 +79,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
                         {
                             products = (from row in dt.AsEnumerable()
                                         select new Products
-                                        {
-                            //     SELECT TOP (1000) Barcode,
-                            //   Cost_Price,
-                            //   Selling_Price,
-                            //   Supplier_Name,
-                            //   Name,
-                            //   Category_Name
-                                            
+                                        {                                            
                                             Barcode = row.Field<string>("Barcode").Trim(),
                                             Cost_Price = row.Field<decimal>("Cost_Price"),
                                             Selling_Price = row.Field<decimal>("Selling_Price"),
@@ -104,80 +100,78 @@ namespace PRODUCT_MANAGEMENT.DataAccess
         }
 
         
-         public void DeleteProduct(string barcode)
+        public string DeleteProduct(string barcode)
         {
-            string sql="DELETE  FROM [Products] WHERE Barcode = '{0}'";
-            StringBuilder errorMessages = new StringBuilder();
-            using (SqlConnection connection=new SqlConnection(AppSettings.ConnectionString))
+            try
             {
-                using (SqlCommand command = new SqlCommand(string.Format(sql,barcode),connection))
+                string sql = "DELETE  FROM [Products] WHERE Barcode = '{0}'";
+                StringBuilder errorMessages = new StringBuilder();
+                using (SqlConnection connection = new SqlConnection(AppSettings.ConnectionString))
                 {
-                    try
+                    using (SqlCommand command = new SqlCommand(string.Format(sql, barcode), connection))
                     {
-                        connection.Open();
-                        command.ExecuteNonQuery();
-                    }
-                    catch(SqlException ex)
-                    {
-                        for (int i = 0; i < ex.Errors.Count; i++)
+                        try
                         {
-                             errorMessages.Append("Index #" + i + "\n" +
-                            "Message: " + ex.Errors[i].Message + "\n" +
-                            "LineNumber: " + ex.Errors[i].LineNumber + "\n" +
-                            "Source: " + ex.Errors[i].Source + "\n" +
-                            "Procedure: " + ex.Errors[i].Procedure + "\n");
+                            connection.Open();
+                            command.ExecuteNonQuery();
                         }
-                        Console.WriteLine(errorMessages.ToString());
+                        catch (SqlException ex)
+                        {
+                            for (int i = 0; i < ex.Errors.Count; i++)
+                            {
+                                errorMessages.Append("Index #" + i + "\n" +
+                               "Message: " + ex.Errors[i].Message + "\n" +
+                               "LineNumber: " + ex.Errors[i].LineNumber + "\n" +
+                               "Source: " + ex.Errors[i].Source + "\n" +
+                               "Procedure: " + ex.Errors[i].Procedure + "\n");
+                            }
+                            Console.WriteLine(errorMessages.ToString());
+                        }
                     }
-                }
-         
-            }
-              
-        }
-        public void UpdateProduct(Products products)
 
-        {   
-              //     SELECT TOP (1000) Barcode,
-             //   Cost_Price,
-            //   Selling_Price,
-           //   Supplier_Name,
-          //   Name,
-         //   Category_Name
-            string sql="UPDATE [Products] " +
-                       "SET Cost_Price = @Cost_Price, Selling_Price = @Selling_Price, Supplier_Name = @Supplier_Name, Name=@Name, Category_Name=@Category_Name"+ 
-                       "Where Barcode=@Barcode";
-            StringBuilder errorMessages = new StringBuilder();
-            using (SqlConnection connection = new SqlConnection(AppSettings.ConnectionString))
+                }
+
+                return barcode;
+            }
+            catch (Exception ex)
             {
-                using (SqlCommand command= new SqlCommand(sql, connection))
+                throw (ex);
+            }
+        }
+
+
+        public Products UpdateProduct(Products product)
+        {
+            try
+            {
+                string sql = "UPDATE [Products] " +
+                           "SET Cost_Price = @Cost_Price, Selling_Price = @Selling_Price, Supplier_Name = @Supplier_Name, Name=@Name, Category_Name=@Category_Name" +
+                           "Where Barcode=@Barcode";
+
+                StringBuilder errorMessages = new StringBuilder();
+
+                using (SqlConnection connection = new SqlConnection(AppSettings.ConnectionString))
                 {
-                    try
+                    using (SqlCommand command = new SqlCommand(sql, connection))
                     {
                         command.CommandType = CommandType.Text;
-                        connection.Open();    
-                        command.Parameters.Add("@Barcode",SqlDbType.Char).Value=products.Barcode;
-                        command.Parameters.Add("@Cost_Price", SqlDbType.VarChar).Value=products.Cost_Price;
-                        command.Parameters.Add("@Selling_Price", SqlDbType.VarChar).Value=products.Selling_Price;
-                        command.Parameters.Add("@Supplier_Name", SqlDbType.VarChar).Value=products.Supplier_Name;
-                        command.Parameters.Add("@Name", SqlDbType.VarChar).Value=products.Name;
-                        command.Parameters.Add("@Category_Name", SqlDbType.VarChar).Value=products.Category_Name;
+                        connection.Open();
+                        command.Parameters.Add("@Barcode", SqlDbType.Char).Value = product.Barcode;
+                        command.Parameters.Add("@Cost_Price", SqlDbType.VarChar).Value = product.Cost_Price;
+                        command.Parameters.Add("@Selling_Price", SqlDbType.VarChar).Value = product.Selling_Price;
+                        command.Parameters.Add("@Supplier_Name", SqlDbType.VarChar).Value = product.Supplier_Name;
+                        command.Parameters.Add("@Name", SqlDbType.VarChar).Value = product.Name;
+                        command.Parameters.Add("@Category_Name", SqlDbType.VarChar).Value = product.Category_Name;
 
                         command.ExecuteNonQuery();
                     }
-                    catch(SqlException ex)
-                    {
-                        for (int i = 0; i < ex.Errors.Count; i++)
-                        {
-                             errorMessages.Append("Index #" + i + "\n" +
-                            "Message: " + ex.Errors[i].Message + "\n" +
-                            "LineNumber: " + ex.Errors[i].LineNumber + "\n" +
-                            "Source: " + ex.Errors[i].Source + "\n" +
-                            "Procedure: " + ex.Errors[i].Procedure + "\n");
-                        }
-                        Console.WriteLine(errorMessages.ToString());
-                    }
-                    
                 }
+
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
             }
         }
     }

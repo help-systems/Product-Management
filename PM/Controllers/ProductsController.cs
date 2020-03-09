@@ -12,7 +12,7 @@ using PRODUCT_MANAGEMENT.DataAccess;
 namespace PRODUCT_MANAGEMENT.Controllers
 {
     [ApiController]
-    [Route("[controller]/[Action]")]
+    [Route("[controller]")]
     public class ProductsController : ControllerBase
     {
 
@@ -26,13 +26,18 @@ namespace PRODUCT_MANAGEMENT.Controllers
 
 
         [HttpGet]
-        public IActionResult GetProducts()
+        public IActionResult Get()
         {
             try
             {
-                var product = Data.GetProducts();
+                var result = Data.GetProducts().ToList();
 
-                return Ok(product);
+                if (result.Count() == 0)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -42,14 +47,16 @@ namespace PRODUCT_MANAGEMENT.Controllers
 
 
         [HttpGet("{barcode}")]
-        public IActionResult GetProducts(string barcode)
+        public IActionResult Get(string barcode)
         {
             try
             {
                 var product = Data.GetProducts().Where(x => x.Barcode == barcode).ToList();
 
-                if (product.Count == 0)
+                if (product.Count() == 0)
+                {
                     return Ok(false);
+                }
 
                 return Ok(product);
             }
@@ -60,12 +67,17 @@ namespace PRODUCT_MANAGEMENT.Controllers
         }
 
 
-        [HttpPost("{products}")]
-        public IActionResult PostProduct (Products products)
+        [HttpPost]
+        public IActionResult Post (Products products)
         {
             try
             {
-                Data.InsertProduct(products);
+                var result = Data.InsertProduct(products);
+
+                if(result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok();
             }
@@ -76,36 +88,45 @@ namespace PRODUCT_MANAGEMENT.Controllers
             
         }
 
-        [HttpDelete("{barcode}")]
-        public ActionResult Delete(string barcode)
+        [HttpPut]
+        public IActionResult Put(Products products)
         {
             try
             {
-                Data.DeleteProduct(barcode);
+                var result = Data.UpdateProduct(products);
+
+                if(result == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
+
+        [HttpDelete("{barcode}")]
+        public IActionResult Delete (string barcode)
+        {
+            try
+            {
+                var result = Data.DeleteProduct(barcode);
+
+                if(result == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok();
             }
             catch
             {
                 return BadRequest("somthing went wrong");
             }
-            return Ok();
-        }
-        
-        [HttpPut("{barcode}")]
-        public ActionResult Update([FromBody]Products products)
-        {
-            try
-            {
-                DataAccessProducts DataAccessProducts = new DataAccessProducts();
-                DataAccessProducts.UpdateProduct(products);
-
-                return Ok();
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(ex);
-            }
-            
-        }
-
+        }      
     }
 }

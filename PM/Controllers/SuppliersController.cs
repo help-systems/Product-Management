@@ -29,7 +29,12 @@ namespace PRODUCT_MANAGEMENT.Controllers
         {
             try
             {
-                var result = Data.GetSuppliers();
+                var result = Data.GetSuppliers().ToList();
+
+                if (result.Count() == 0)
+                {
+                    return BadRequest();
+                }
 
                 return Ok(result);
             }
@@ -48,7 +53,9 @@ namespace PRODUCT_MANAGEMENT.Controllers
                 var result = Data.GetSuppliers().Where(x => x.Company_Name == company_name).ToList();
 
                 if (result.Count() == 0)
-                    return NotFound();
+                {
+                    return Ok(false);
+                }
 
                 return Ok(result);
             }
@@ -60,11 +67,16 @@ namespace PRODUCT_MANAGEMENT.Controllers
 
 
         [HttpPost]
-        public ActionResult Post(Suppliers suppliers)
+        public IActionResult Post(Suppliers suppliers)
         {
             try
             {
-                Data.InsertSuppliers(suppliers);
+                var result = Data.InsertSuppliers(suppliers);
+
+                if (result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok();
             }
@@ -76,11 +88,16 @@ namespace PRODUCT_MANAGEMENT.Controllers
 
 
         [HttpPut]
-        public ActionResult Put(List<Suppliers> supplier)
+        public IActionResult Put(List<Suppliers> supplier)
         {
             try
             {
                 var result = Data.UpdateSupplier(supplier[0], supplier[1]);
+                
+                if (result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok(result);
             }
@@ -89,30 +106,19 @@ namespace PRODUCT_MANAGEMENT.Controllers
                 return BadRequest(ex);
             }
         }
-         
-        [HttpPut]
-        public ActionResult Update([FromBody] Suppliers suppliers, string s1, string s2 )
+
+
+        [HttpDelete("{company_Name}")]
+        public IActionResult Delete(string company_Name)
         {
             try
             {
-                DataAccessSuppliers suppliersDALDC = new DataAccessSuppliers();
-                return Ok();
-            } 
-            catch(Exception ex)
-           {
-               return BadRequest(ex);
-           }
-         
-        }
+                var result = Data.DeleteSuppliers(company_Name);
 
-
-
-        [HttpDelete]
-        public ActionResult Delete(string company_Name)
-        {
-            try
-            {
-                Data.DeleteSuppliers(company_Name);
+                if(result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok();
             }
