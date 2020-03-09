@@ -9,17 +9,17 @@ namespace PRODUCT_MANAGEMENT.DataAccess
 {
     public class DataAccessSearch
     {
-        private const string _coneectionString
-            = @"Data Source=LAPTOP-746F832P;Initial Catalog=Supermarket_DB;Integrated Security=True";
+        //private const string _coneectionString
+        //    = @"Data Source=DESKTOP-6NUHAOM\DROSQL;Initial Catalog=Supermarket_DB;Integrated Security=True";
 
         private SqlConnection _connnection;
 
         public DataAccessSearch()
         {
-            _connnection = new SqlConnection(_coneectionString);
+            _connnection = new SqlConnection(AppSettings.ConnectionString);
         }
 
-        public List<ProductsInBW> Search(ProductsInBW product)
+        public List<ProductsInBW> MainSearch(ProductsInBW product)
         {
             List<ProductsInBW> items = new List<ProductsInBW>();
 

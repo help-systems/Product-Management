@@ -18,16 +18,14 @@ namespace PRODUCT_MANAGEMENT.Controllers
     {
         private readonly DataAccessSearch Data = new DataAccessSearch();
 
-        [HttpPost("{product}")]
-        public IActionResult Search (string product)
+        [HttpGet]
+        public IActionResult Get (ProductsInBW product)
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject<ProductsInBW>(product);
+                var result = Data.MainSearch(product).ToList();
 
-                var result = Data.Search(obj).ToList();
-
-                if(result.Count()==0)
+                if (result.Count() == 0)
                 {
                     return Ok(false);
                 }

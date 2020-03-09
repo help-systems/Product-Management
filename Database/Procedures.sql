@@ -136,3 +136,16 @@ AS
 		Supplier_Name = isnull(@Supplier_Name, Supplier_Name)
 
 GO
+
+CREATE PROCEDURE PutCategory
+	@Parent_Category VARCHAR(50),
+	@NewCategoryName VARCHAR(50),
+	@OldCategoryName VARCHAR(50)	
+AS
+BEGIN
+	Update Categories SET
+		Parent_Category = @Parent_Category,
+		Category_Name = @NewCategoryName
+			WHERE Category_Name = @OldCategoryName
+END
+GO

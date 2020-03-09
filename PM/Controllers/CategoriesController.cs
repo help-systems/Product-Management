@@ -23,21 +23,28 @@ namespace PRODUCT_MANAGEMENT.Controllers
         {
             _logger = logger;
         }
-        
+
+
         [HttpGet]
         public IActionResult Get()
         {
             try
             {
-                var result = Data.GetCategoriers();
+                var result = Data.GetCategoriers().Where(x => x.Category_Name != "null").ToList();
+
+                if (result.Count() == 0)
+                {
+                    return BadRequest();
+                }
 
                 return Ok(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
         }
+
 
         [HttpGet("{category_name}")]
         public IActionResult Get (string category_name)
@@ -47,7 +54,9 @@ namespace PRODUCT_MANAGEMENT.Controllers
                 var result = Data.GetCategoriers().Where(x => x.Category_Name == category_name).ToList();
 
                 if (result.Count() == 0)
-                    return NotFound();
+                {
+                    return Ok(false);
+                }
 
                 return Ok(result);
             }
@@ -57,15 +66,41 @@ namespace PRODUCT_MANAGEMENT.Controllers
             }
         }
 
+
         [HttpPost]
-        public ActionResult Post (Categories category)
+        public IActionResult Post (Categories category)
         {
             try
             {
-                Data.InsertCategories(category);
+                var result = Data.InsertCategories(category);
+
+                if(result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
+
+        [HttpPut]
+        public IActionResult Put (Categories category)
+        {
+            try
+            {
+                var result = Data.UpdateCategory(category);
+
+                if(result == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -75,17 +110,23 @@ namespace PRODUCT_MANAGEMENT.Controllers
 
            
         [HttpDelete("{category_name}")]
-        public ActionResult Delete (string category_name)
+        public IActionResult Delete (string category_name)
         {
             try
             {
-                Data.DeleteCategories(category_name);
+                var result = Data.DeleteCategories(category_name);
+
+                if (result == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(result);
             }
             catch(Exception ex)
             {
                 return BadRequest(ex);
             }
-            return Ok();
         }
     }
 }
