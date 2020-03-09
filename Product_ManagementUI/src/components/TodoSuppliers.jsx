@@ -63,7 +63,9 @@ class TodoSuppliers extends React.Component {
         // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
        
         supplierobject.map(item => {
-            item.edit = false;
+            
+            this.state.currentEDitSupplier.name === item.company_Name ?              
+            item.edit = true : item.edit = false
             item.index = supplierobject.indexOf(item) + 1;
             return item;
         })
