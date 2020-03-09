@@ -1,4 +1,15 @@
 .DS_STORE
+
+bin/
+obj/
+project.lock.json
+NuGetScratch/
+
+api/wwwroot/**
+!api/wwwroot/scratch.html
+!api/wwwroot/favicon.ico
+
+
 node_modules
 scripts/flow/*/.flowconfig
 *~
