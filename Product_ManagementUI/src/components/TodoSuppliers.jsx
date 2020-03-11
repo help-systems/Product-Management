@@ -59,19 +59,27 @@ class TodoSuppliers extends React.Component {
 
         let url =this.state.base_url + `Suppliers/`;			
         let response = await fetch(url);
-        let supplierobject = await response.json();
+        let suppliernewobject = await response.json();
         // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
-       
-        supplierobject.map(item => {
-            
-            this.state.currentEDitSupplier.name === item.company_Name ?              
-            item.edit = true : item.edit = false
-            item.index = supplierobject.indexOf(item) + 1;
+        suppliernewobject.map(item => {
+            item.edit = false;
+            item.index = suppliernewobject.indexOf(item) + 1;
             return item;
         })
-        this.setState({
-            supplierobject
-        })
+        console.log("jdhjfhdgjdhgiu")
+        if(JSON.stringify(suppliernewobject) !== JSON.stringify(this.state.supplierobject)){
+            suppliernewobject.map(item => {
+            
+                this.state.currentEDitSupplier.name === item.company_Name ?              
+                item.edit = true : item.edit = false
+                item.index = suppliernewobject.indexOf(item) + 1;
+                return item;
+            })
+            this.setState({
+                supplierobject:suppliernewobject
+            })
+        }
+        
 
     }
 
@@ -209,7 +217,9 @@ class TodoSuppliers extends React.Component {
 
     cancelChange = () =>{
         let supplierobject = this.state.supplierobject;
+        let supplierobj = this.state.supplierobj;
         let currentEDitSupplier = this.state.currentEDitSupplier;
+        supplierobj.company_Name = currentEDitSupplier.name;
 
         supplierobject.map(item => {
             if (item.index === currentEDitSupplier.index) {
@@ -222,27 +232,28 @@ class TodoSuppliers extends React.Component {
             supplierobject,
             modal3: !this.state.modal3,
             currentEDitSupplier,
+            supplierobj,
             is_delete:false,
             addsituation:true
 
         });
     }
 
-    cancelChangeSingle = () =>{
+    // cancelChangeSingle = () =>{
 
-        let supplierobj = this.state.supplierobj;
-        let currentEDitSupplier = this.state.currentEDitSupplier;
-        supplierobj.company_Name = currentEDitSupplier.name;
+    //     let supplierobj = this.state.supplierobj;
+    //     let currentEDitSupplier = this.state.currentEDitSupplier;
+    //     supplierobj.company_Name = currentEDitSupplier.name;
         
-        currentEDitSupplier = {name:"",index:""};
-        this.setState({
-            supplierobj,
-            modal3: !this.state.modal3,
-            currentEDitSupplier,
-            is_delete:false,
-            inputNewSupplier:""
-        });
-    }
+    //     currentEDitSupplier = {name:"",index:""};
+    //     this.setState({
+    //         supplierobj,
+    //         modal3: !this.state.modal3,
+    //         currentEDitSupplier,
+    //         is_delete:false,
+    //         inputNewSupplier:""
+    //     });
+    // }
     
    async saveChange() {
 
@@ -578,7 +589,7 @@ class TodoSuppliers extends React.Component {
                                                     color="secondary" 
                                                     size="sm" 
                                                     onClick={() => {
-                                                        this.cancelChangeSingle();                                                                
+                                                        this.cancelChange();                                                                
                                                     }}
                                                 >
                                                     Close

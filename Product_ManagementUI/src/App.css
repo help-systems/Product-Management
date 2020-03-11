@@ -185,3 +185,27 @@ padding-left: 6px;
 #addnewvalues {
     margin-bottom: 30px;
 }
+
+#table td,#table th  {
+    width: 12.5% !important;
+}
+
+table input {
+    width: 90px;
+}
+
+.produc_BW {
+    font-size: 14px;
+    padding: 2em 1em;
+    background: #47494f;
+} 
+
+.produc_BW:hover {
+    border-left: 5px solid #4c97c8;
+    background: transparent !important;
+}
+
+.showBW {
+    border-left: 5px solid #4c97c8;
+    background: transparent !important;
+}
