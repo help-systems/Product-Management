@@ -12,14 +12,14 @@ using PRODUCT_MANAGEMENT.Models;
 namespace PRODUCT_MANAGEMENT.Controllers
 {
     [ApiController]
-    [Route("[controller]/[Action]")]
+    [Route("[controller]")]
     [EnableCors("AllowAllHeaders")]
     public class SearchController : ControllerBase
     {
         private readonly DataAccessSearch Data = new DataAccessSearch();
 
-        [HttpGet]
-        public IActionResult Get (ProductsInBW product)
+        [HttpPost]
+        public IActionResult Post (ProductsInBW product)
         {
             try
             {

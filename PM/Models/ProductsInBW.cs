@@ -15,5 +15,6 @@ namespace PRODUCT_MANAGEMENT.Models
         public string Category_Name { get; set; }
         public string BW_Name { get; set; }
         public int Count { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
     }
 }

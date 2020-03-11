@@ -1,10 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Controllers",
-    "\\DataAccess",
-    "\\Models"
+    "\\Controllers"
   ],
-  "SelectedNode": "\\DataAccess\\DataAccessPIB.cs",
+  "SelectedNode": "\\Models",
   "PreviewInSolutionExplorer": false
 }

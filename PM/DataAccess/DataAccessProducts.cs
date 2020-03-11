@@ -145,7 +145,7 @@ namespace PRODUCT_MANAGEMENT.DataAccess
             try
             {
                 string sql = "UPDATE [Products] " +
-                           "SET Cost_Price = @Cost_Price, Selling_Price = @Selling_Price, Supplier_Name = @Supplier_Name, Name=@Name, Category_Name=@Category_Name" +
+                           "SET Cost_Price = @Cost_Price, Selling_Price = @Selling_Price, Supplier_Name = @Supplier_Name, Name=@Name, Category_Name=@Category_Name " +
                            "Where Barcode=@Barcode";
 
                 StringBuilder errorMessages = new StringBuilder();
