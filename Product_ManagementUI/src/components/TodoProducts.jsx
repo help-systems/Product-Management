@@ -39,11 +39,6 @@ class TodoProducts extends React.Component {
             editableName:"",
             editableCost_Price:"",
             editableSelling_Price:"",
-            // inputNewProduct:"",
-            // parentCategories:[],
-            // currentCategory:"",
-            
-            
             currentEDitProduct:{
                     barcode:"",
                     name:"",
@@ -56,11 +51,6 @@ class TodoProducts extends React.Component {
             
         };
         this.todoSearchBarcode = this.todoSearchBarcode.bind(this);
-        this.plus = this.plus.bind(this);
-        // this.handleCategoryChange = this.handleCategoryChange.bind(this);
-        // this.handleParentCategoryChange = this.handleParentCategoryChange.bind(this);
-        // // this.handleCategoryChangeSingle = this.handleCategoryChangeSingle.bind(this);
-        // // this.handleParentCategoryChangeSingle = this.handleParentCategoryChangeSingle.bind(this);
         this.saveChange = this.saveChange.bind(this);
         this.todoAdd = this.todoAdd.bind(this);
     }
@@ -70,43 +60,22 @@ class TodoProducts extends React.Component {
         let url =this.state.base_url + `Products/`;			
         let response = await fetch(url);
         let productslist = await response.json();
-        // let productslist = [
-        //     { barcode:"2222",
-        //      name:"product1",
-        //      cost_Price:222,
-        //      selling_Price:444,
-        //      supplier_Name:"FFFF",
-        //      category_Name:"aaa"},
-        //      {
-        //      barcode:"888",
-        //      name:"product2",
-        //      cost_Price:222,
-        //      selling_Price:444,
-        //      supplier_Name:"FFFF",
-        //      category_Name:"aaa"},
-        //      { barcode:"22242",
-        //         name:"product3",
-        //         cost_Price:222,
-        //         selling_Price:444,
-        //         supplier_Name:"kkk",
-        //         category_Name:"aaa"
-        //     }
-        //     ]
-            productslist.map(item => {
-                item.edit = false;
-                item.index = productslist.indexOf(item) + 1;
-                return item;
-            })
-            let url1 =this.state.base_url + `Categories/`;			
-            let response1 = await fetch(url1);
-            let categoriesNames = await response1.json();
-    
-            let url2 =this.state.base_url + `Suppliers/`;			
-            let response2 = await fetch(url2);
-            let supplierNames = await response2.json();
+        
+        productslist.map(item => {
+            item.edit = false;
+            item.index = productslist.indexOf(item) + 1;
+            return item;
+        })
+        let url1 =this.state.base_url + `Categories/`;			
+        let response1 = await fetch(url1);
+        let categoriesNames = await response1.json();
 
-            categoriesNames = [...new Set(categoriesNames.map(item => item.category_Name))];
-            supplierNames = [...new Set(supplierNames.map(item => item.company_Name))];
+        let url2 =this.state.base_url + `Suppliers/`;			
+        let response2 = await fetch(url2);
+        let supplierNames = await response2.json();
+
+        categoriesNames = [...new Set(categoriesNames.map(item => item.category_Name))];
+        supplierNames = [...new Set(supplierNames.map(item => item.company_Name))];
             
         this.setState({
             productslist,
@@ -126,7 +95,7 @@ class TodoProducts extends React.Component {
             item.index = productsnewlist.indexOf(item) + 1;
             return item;
         })
-        console.log("dfjghdgjdgh")
+
         if(JSON.stringify(productsnewlist) !== JSON.stringify(this.state.productslist)){
 
             productsnewlist.map(item => {
@@ -206,22 +175,24 @@ class TodoProducts extends React.Component {
     async todoSearchBarcode () {
 
         if(this.state.searchBarcode.trim() !== ""){
+
             let url = this.state.base_url + `Products/${this.state.searchBarcode}`;
             let response = await fetch(url);
-            let productobject = await response.json();  
-            // let productobject= this.state.productslist[0];        
-            // console.log(productobject);
+            let productobject = await response.json();
 
             if(!productobject){
                 this.setState({
-                    productobject:{},
+                    productobject:false,
                     is_searchBarcode:false,
+                    is_dublicate:false,
                     is_wrongBarcode:true
                 });
             }else {
-                productobject = productobject[0];
-                // productobject = this.state.productslist[0];
-                productobject.edit = false;
+
+                productobject = this.state.productslist.filter(item => {
+                    // return item.barcode === productobject[0].barcode
+                    return item.barcode === this.state.searchBarcode
+                })
 
                 this.setState({
                     productobject,
@@ -236,7 +207,7 @@ class TodoProducts extends React.Component {
                 searchBarcode:"",
                 is_dublicate:false,
                 is_searchBarcode:false,
-                is_wrongBarcode:false
+                addsituation:false
             })
         }
         
@@ -248,6 +219,7 @@ class TodoProducts extends React.Component {
         let response;
         let url;
         let productslist = this.state.productslist;
+        let productobject = this.state.productobject;
         let is_dublicate = this.state.is_dublicate;
 
         if(this.state.is_delete){
@@ -275,8 +247,6 @@ class TodoProducts extends React.Component {
             this.setState({
                 is_delete:false,
                 is_searchBarcode:false,
-                // category:"",
-                // categoryobj:{},
                 currentDeleter:""
             });
 
@@ -346,23 +316,13 @@ class TodoProducts extends React.Component {
         }      
         
         
-        // let categoryobj = this.state.categoryobj;
-
-        // if(this.state.is_searchcategory){
-        //     categoryobj.category_Name = this.state.currentCategory;
-        //     categoryobj.parent_Category= this.state.currentParentCategory;
-
-        // }
-
         this.setState({
             modal3: !this.state.modal3,
             productslist,
-            // productobject,
+            productobject,
             is_edit:false,
             is_add:false,
             is_dublicate:false,
-            // currentCategory:"",
-            // currentParentCategory:"",
             newBarcode:"",
             newProduct:"",
             newcost_Price:0,
@@ -432,7 +392,7 @@ class TodoProducts extends React.Component {
         });
     }
 
-    async plus() {
+    plus = () => {
         this.setState({
             addsituation:true,
             is_dublicate:false,
@@ -492,9 +452,8 @@ class TodoProducts extends React.Component {
           });
     }
 
-    todoEdit=(barcode) => {
+    todoEdit = (barcode) => {
         
-
         let productslist = this.state.productslist;
         let currentEDitProduct = this.state.currentEDitProduct;
         let productobject = this.state.productobject;
@@ -562,8 +521,7 @@ class TodoProducts extends React.Component {
         });
     }
 
-    render() {  
-        let i = 0;    
+    render() {   
         return(
             <div id="main" className="card-body card">
                  <div className = "search" id = "maininfo">
@@ -593,9 +551,9 @@ class TodoProducts extends React.Component {
                         <div id = "addnewvalues">
                             <div id = "FaMinus">
                                 <span className="table-add float-right mb-3 mr-2">
-                                    <a href="#" className="text-success">
-                                    <FaMinus className = "minus" onClick = {this.minus}/>
-                                    </a>
+                                    <p  className="text-success">
+                                        <FaMinus className = "minus" onClick = {this.minus}/>
+                                    </p>
                                 </span>
                             </div>
                             <div className="form-group">
@@ -670,9 +628,8 @@ class TodoProducts extends React.Component {
                                         <option selected disabled>Choose...</option>
                                         { 
                                             this.state.supplierNames.map(item => {
-                                                {i++};
                                                 return(
-                                                    <option key = {i} value={item}>{item}</option>
+                                                    <option key = {item} value={item}>{item}</option>
                                                 );
                                             })
                                         }
@@ -688,9 +645,8 @@ class TodoProducts extends React.Component {
                                         <option selected disabled>Choose...</option>
                                         { 
                                             this.state.categoriesNames.map(item => {
-                                                {i++};
                                                 return(
-                                                    <option key = {i} value={item}>{item}</option>
+                                                    <option key = {item} value={item}>{item}</option>
                                                 );
                                             })
                                         }
@@ -717,9 +673,9 @@ class TodoProducts extends React.Component {
                         </div>
                         :
                         <span className="table-add float-right mb-3 mr-2">
-                            <a href="#" className="text-success">
+                            <p className="text-success">
                             <FaPlus onClick = {this.plus}/>
-                            </a>
+                            </p>
                         </span>
                     }
                     <div>
@@ -745,26 +701,26 @@ class TodoProducts extends React.Component {
                             <tr>
                                
                                 <td className="pt-3-half">
-                                    {this.state.productobject.barcode}
+                                    {this.state.productobject[0].barcode}
                                 </td>
                                 { 
-                                   !this.state.productobject.edit ? 
+                                   !this.state.productobject[0].edit ? 
                                    <>
                                         
                                         <td className="pt-3-half">
-                                            {this.state.productobject.name}
+                                            {this.state.productobject[0].name}
                                         </td> 
                                         <td className="pt-3-half">
-                                            {this.state.productobject.cost_Price}
+                                            {this.state.productobject[0].cost_Price}
                                         </td> 
                                         <td className="pt-3-half">
-                                            {this.state.productobject.selling_Price}
+                                            {this.state.productobject[0].selling_Price}
                                         </td>
                                         <td className="pt-3-half">
-                                            {this.state.productobject.supplier_Name}
+                                            {this.state.productobject[0].supplier_Name}
                                         </td>
                                         <td className="pt-3-half">
-                                            {this.state.productobject.category_Name}
+                                            {this.state.productobject[0].category_Name}
                                         </td>
                                     </>
                                     :
@@ -821,7 +777,7 @@ class TodoProducts extends React.Component {
                                                 <option value="null"> - </option>
                                                 { 
                                                     this.state.categoriesNames.map(item => {
-                                                       {
+                                                       
                                                            return(
                                                             item === this.state.selectcategory_Name?
                                                             
@@ -830,7 +786,7 @@ class TodoProducts extends React.Component {
                                                             
                                                             <option key = {item} value={item}>{item}</option>
                                                            );
-                                                       }
+                                                       
                                                     })
                                                 }
                                             </select>
@@ -838,9 +794,9 @@ class TodoProducts extends React.Component {
                                     </>
                                 }
                                 {
-                                    !this.state.productobject.edit ? 
+                                    !this.state.productobject[0].edit ? 
                                     <td>
-                                        <MDBBtn  color="primary" onClick ={(e) => {this.todoEdit(this.state.productobject.barcode)}} >
+                                        <MDBBtn  color="primary" onClick ={(e) => {this.todoEdit(this.state.productobject[0].barcode)}} >
                                             <FaEdit className="editicon"/>
                                             Edit
                                         </MDBBtn>
@@ -849,7 +805,7 @@ class TodoProducts extends React.Component {
                                     <td>
                                         <MDBBtn 
                                         color="primary" 
-                                        onClick={(e) => {this.todoSave(this.state.productobject.Barcode)}}
+                                        onClick={(e) => {this.todoSave(this.state.productobject[0].Barcode)}}
                                         >
                                             <FaSave className="editicon"/>
                                             Save
@@ -862,7 +818,7 @@ class TodoProducts extends React.Component {
                                             className = "deletebutton"
                                             color="primary" 
                                             onClick={(e)=>{
-                                                this.todoDelete(this.state.productobject.barcode);
+                                                this.todoDelete(this.state.productobject[0].barcode);
                                             }}
                                         >
                                             <MdDeleteForever className = "deleteicon"/>
@@ -995,7 +951,7 @@ class TodoProducts extends React.Component {
                                                 <option value="null"> - </option>
                                                 { 
                                                     this.state.categoriesNames.map(item => {
-                                                    {
+                                                    
                                                         return(
                                                             item === this.state.selectcategory_Name?
                                                             
@@ -1004,7 +960,7 @@ class TodoProducts extends React.Component {
                                                             
                                                             <option key = {item} value={item}>{item}</option>
                                                         );
-                                                    }
+                                                    
                                                     })
                                                 }
                                             </select>

@@ -13,7 +13,7 @@ class TodoSuppliers extends React.Component {
 		super(props);
 		this.state = {		
             base_url:"http://localhost:51560/",	
-            supplierobj:{},
+            supplierobj:false,
             is_searchsupplier:false,
             supplier:"",       
             modal3: false,
@@ -28,11 +28,10 @@ class TodoSuppliers extends React.Component {
             inputNewSupplier:"",
             is_repeatsupplier:false,
             currentEDitSupplier:{name:"",index:""},
-            supplierobject:[]
+            supplierslist:[]
         };
         this.SupplierSearch = this.SupplierSearch.bind(this);
         this.handleSupplierChange = this.handleSupplierChange.bind(this);
-        // this.handleSupplierChangeSingle = this.handleSupplierChangeSingle.bind(this);
         this.saveChange = this.saveChange.bind(this);
         this.todoSave = this.todoSave.bind(this);
         this.todoAdd = this.todoAdd.bind(this);
@@ -42,16 +41,15 @@ class TodoSuppliers extends React.Component {
 
         let url =this.state.base_url + `Suppliers/`;			
         let response = await fetch(url);
-        let supplierobject = await response.json();
-        // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
-       
-        supplierobject.map(item => {
+        let supplierslist = await response.json();
+        
+        supplierslist.map(item => {
             item.edit = false;
-            item.index = supplierobject.indexOf(item) + 1;
+            item.index = supplierslist.indexOf(item) + 1;
             return item;
         })
         this.setState({
-            supplierobject
+            supplierslist
         })
     }
 
@@ -60,27 +58,19 @@ class TodoSuppliers extends React.Component {
         let url =this.state.base_url + `Suppliers/`;			
         let response = await fetch(url);
         let suppliernewobject = await response.json();
-        // let supplierobject = [{company_Name:"gsdgxdfg"},{company_Name:"koko"},{company_Name:"sfsfsf"},{company_Name:"BBBBBB"}]
+        
         suppliernewobject.map(item => {
-            item.edit = false;
+            this.state.currentEDitSupplier.name === item.company_Name ?              
+            item.edit = true : item.edit = false
             item.index = suppliernewobject.indexOf(item) + 1;
             return item;
         })
-        console.log("jdhjfhdgjdhgiu")
-        if(JSON.stringify(suppliernewobject) !== JSON.stringify(this.state.supplierobject)){
-            suppliernewobject.map(item => {
-            
-                this.state.currentEDitSupplier.name === item.company_Name ?              
-                item.edit = true : item.edit = false
-                item.index = suppliernewobject.indexOf(item) + 1;
-                return item;
-            })
+        
+        if(JSON.stringify(suppliernewobject) !== JSON.stringify(this.state.supplierslist)){
             this.setState({
-                supplierobject:suppliernewobject
+                supplierslist:suppliernewobject
             })
         }
-        
-
     }
 
     handleInputSupplier = (e) => {
@@ -89,17 +79,19 @@ class TodoSuppliers extends React.Component {
         });
     } 
     
-    handleSupplierChange (index,e) {
+    handleSupplierChange (e) {
 
-        let is_repeatsupplier = this.state.is_repeatsupplier;
-        this.setState({
-            currentEditer:e.target.value
+        let is_repeatsupplier = false;
+        let supplierslist = this.state.supplierslist;
+        supplierslist.map(item => {
+            if(e.target.value === item.company_Name){
+                is_repeatsupplier = true;
+            }
+            return item;
         })
-    }
-
-    handleSupplierChangeSingle =(e) => {
         this.setState({
-            currentEditer:e.target.value
+            currentEditer:e.target.value,
+            is_repeatsupplier
         })
     }
 
@@ -109,25 +101,27 @@ class TodoSuppliers extends React.Component {
         })
     }
 
-    async SupplierSearch(){  
+    async SupplierSearch(){
 
         if(this.state.supplier.trim() !== ""){
-            let url = this.state.base_url + `Suppliers/${this.state.supplier}`;
-            
+
+            let url = this.state.base_url + `Suppliers/${this.state.supplier}`;            
             let response = await fetch(url);
-            let supplierobj = await response.json();
-            console.log(supplierobj);      
-            
+            let supplierobj = await response.json();          
+                        
             if(!supplierobj){
                 this.setState({
-                    supplierobj:{},
+                    supplierobj:false,
                     is_searchsupplier:false,
                     is_dublicate:false,
                     is_wrongsupplier:true,
                 });
             }else {
-                supplierobj = supplierobj[0];
-                supplierobj.edit = false;
+
+                supplierobj = this.state.supplierslist.filter(item => {
+                    return item.company_Name === supplierobj[0].company_Name
+                    // return item.company_Name === this.state.supplier;
+                })
 
                 this.setState({
                     supplierobj,
@@ -135,71 +129,59 @@ class TodoSuppliers extends React.Component {
                     supplier:"",
                     is_searchsupplier:true,
                     is_dublicate:false
-                })	
+                })
+                console.log(this.state.supplierobj); 
             }	
         }else{
             this.setState({
-                supplierobj:{},
+                supplierobj:false,
                 is_searchsupplier:false,
                 is_dublicate:false
             });
         }
+        console.log(this.state.supplierobj); 
     }
 
-    todoSave(index,e) {
-
-        let supplierobject = this.state.supplierobject;
-        supplierobject.map(item => {
-          if(item.index === index){
-              item.edit = !item.edit;
-          }
-            return item;
-        })
-        this.setState({
-            supplierobject,
-            modal3: !this.state.modal3,
-            is_edit:true
-        });
-    }
-
-    todoSaveSingle = (e) => {
-        let supplierobj = this.state.supplierobj;
-        supplierobj.edit = !supplierobj.edit
-       
-        this.setState({
-            supplierobj,
-            modal3: !this.state.modal3,
-            is_edit:true
-        });
+    todoSave(index) {
+        if(!this.state.is_repeatsupplier){
+            let supplierslist = this.state.supplierslist;
+            supplierslist.map(item => {
+            if(item.index === index){
+                item.edit = !item.edit;
+            }
+                return item;
+            })
+            this.setState({
+                supplierslist,
+                modal3: !this.state.modal3,
+                is_edit:true
+            });
+        }
+        
     }
 
     todoEdit = (company) => {
 
-        let supplierobject = this.state.supplierobject;
+        console.log(company)
+        let supplierslist = this.state.supplierslist;
         let currentEDitSupplier;
-        supplierobject.map(item => {
-          if(item.company_Name === company){
-              console.log(item.company_Name)
-              item.edit = !item.edit;
-              currentEDitSupplier= {name:company,index:item.index}
-          }
-            return item;
-        })
-        this.setState({
-            supplierobject,
-            currentEDitSupplier,
-            currentEditer:company
-            
-        });
-    }
-    
-    todoEditSingle= (company) => {
+        let supplierobj = this.state.supplierobj
         
-        let supplierobj = this.state.supplierobj;
-        supplierobj.edit = !supplierobj.edit;
-        let currentEDitSupplier  = {name:company,index:""};
-     
+        if(this.state.is_searchsupplier){
+            supplierobj[0].edit = true;
+            currentEDitSupplier= {name:company,index:supplierobj[0].index}
+        }else{
+            supplierslist.map(item => {
+                if(item.company_Name === company){
+                    item.edit = !item.edit;
+                    currentEDitSupplier= {name:company,index:item.index}
+                }
+                  return item;
+              })
+        }        
+        
         this.setState({
+            supplierslist,
             supplierobj,
             currentEDitSupplier,
             currentEditer:company
@@ -211,56 +193,48 @@ class TodoSuppliers extends React.Component {
         this.setState({
             modal3: !this.state.modal3,
             is_delete:true,
-            currentDeleter:name
+            currentDeleter:name,
+            currentEDitSupplier:{name,index:""}
           });
     }
 
     cancelChange = () =>{
-        let supplierobject = this.state.supplierobject;
+
+        let supplierslist = this.state.supplierslist;
         let supplierobj = this.state.supplierobj;
         let currentEDitSupplier = this.state.currentEDitSupplier;
-        supplierobj.company_Name = currentEDitSupplier.name;
 
-        supplierobject.map(item => {
-            if (item.index === currentEDitSupplier.index) {
-                item.company_Name = currentEDitSupplier.name;
-            }
-            return item;
-        })
+        if(this.state.is_searchsupplier){
+            console.log(currentEDitSupplier)
+            supplierobj[0].company_Name = this.state.currentEDitSupplier.name;
+            supplierobj[0].edit = false;
+            console.log(supplierobj)
+        }else{
+            supplierslist.map(item => {
+                if (item.index === currentEDitSupplier.index) {
+                    item.company_Name = currentEDitSupplier.name;
+                }
+                return item;
+            })
+        }
         currentEDitSupplier = {name:"",index:""};
         this.setState({
-            supplierobject,
+            supplierslist,
             modal3: !this.state.modal3,
             currentEDitSupplier,
             supplierobj,
-            is_delete:false,
-            addsituation:true
+            is_delete:false
 
         });
     }
 
-    // cancelChangeSingle = () =>{
-
-    //     let supplierobj = this.state.supplierobj;
-    //     let currentEDitSupplier = this.state.currentEDitSupplier;
-    //     supplierobj.company_Name = currentEDitSupplier.name;
-        
-    //     currentEDitSupplier = {name:"",index:""};
-    //     this.setState({
-    //         supplierobj,
-    //         modal3: !this.state.modal3,
-    //         currentEDitSupplier,
-    //         is_delete:false,
-    //         inputNewSupplier:""
-    //     });
-    // }
     
    async saveChange() {
 
         let settings;
         let response;
         let url;
-        let supplierobject = this.state.supplierobject;
+        let supplierslist = this.state.supplierslist;
         let supplierobj = this.state.supplierobj;
         let currentDeleter = this.state.currentDeleter;
         let is_dublicate = this.state.is_dublicate;
@@ -283,18 +257,12 @@ class TodoSuppliers extends React.Component {
 			};
 			
             response = await fetch(url,settings);
-            
-            supplierobject =  supplierobject.filter(item => {
-                if (item.company_Name !== this.state.currentDeleter) {
-                    return item;
-                }
-            })
 
             this.setState({
                 is_delete:false,
                 is_searchsupplier:false,
                 supplier:"",
-                supplierobject,
+                supplierslist,
                 supplierobj:{},
                 currentDeleter:""
             });
@@ -325,33 +293,20 @@ class TodoSuppliers extends React.Component {
 			
             response = await fetch(url,settings);
 
-            supplierobject.map(item => {
-
-                if(item.index !== this.state.currentEDitSupplier.index){
-                    return item;
-                }
-                if(this.state.currentEditer.trim() === ""){
-                    item.company_Name = this.state.currentEDitSupplier.name;
-                }else {
-                    item.company_Name = this.state.currentEditer;
-                }           
-                return item;
-            })
-            
-           
-    
             if(this.state.is_searchsupplier){
-                supplierobj.company_Name = this.state.currentEditer
+                let supplierobj = this.state.supplierobj;
+                supplierobj[0].edit = false;
+                supplierobj[0].company_Name = this.state.currentEditer;
             }
+            this.setState({
+                supplierobj
+            })
 
         }else if(this.state.is_add){
-
-            console.log(this.state.inputNewSupplier)
-            console.log( this.state.inputNewSupplier)
             
             let newsupplier = {company_Name: this.state.inputNewSupplier}    
-            let url = this.state.base_url + 'Suppliers';
-            let settings = {
+            url = this.state.base_url + 'Suppliers';
+            settings = {
                 method: "POST",
                 headers: {
                     Accept: 'application/json',
@@ -364,27 +319,22 @@ class TodoSuppliers extends React.Component {
                 },
                 body: JSON.stringify (newsupplier)
             };                    
-            let response = await fetch(url,settings);
-            // newsupplier.edit = false;
-            // newsupplier.index = 0;  
-            // supplierobject.unshift(newsupplier); 
-            // supplierobject.map(item => {
-            //     item.index++;
-            //     return item;
-            // })
+            response = await fetch(url,settings);
+            
+            
 
             this.setState({                    
                 addsituation:false,
                 is_dublicate,
                 inputNewSupplier:"",
-                supplierobject
+                supplierslist
             })            
         }
         
 
         this.setState({
             modal3: !this.state.modal3,
-            supplierobject,
+            supplierslist,
             supplierobj,
             is_edit:false,
             is_add:false,
@@ -412,8 +362,8 @@ class TodoSuppliers extends React.Component {
     async todoAdd () {
 
         let is_dublicate = this.state.is_dublicate;
-        let supplierobject = this.state.supplierobject;
-        is_dublicate = supplierobject.some(item => {
+        let supplierslist = this.state.supplierslist;
+        is_dublicate = supplierslist.some(item => {
             return item.company_Name === this.state.inputNewSupplier;
         })
         if(!is_dublicate && this.state.inputNewSupplier.trim() !== ""){
@@ -464,9 +414,9 @@ class TodoSuppliers extends React.Component {
                         <div id = "addnewvalues">
                             <div id = "FaMinus">
                                 <span className="table-add float-right mb-3 mr-2">
-                                    <a href="#" className="text-success">
+                                    <p className="text-success">
                                     <FaMinus className = "minus" onClick = {this.minus}/>
-                                    </a>
+                                    </p>
                                 </span>
                             </div>
                             <div className="form-group">
@@ -500,9 +450,9 @@ class TodoSuppliers extends React.Component {
                         </div>
                         :
                         <span className="table-add float-right mb-3 mr-2">
-                            <a href="#" className="text-success">
+                            <p className="text-success">
                             <FaPlus onClick = {this.plus}/>
-                            </a>
+                            </p>
                         </span>
                     }                    
                     {
@@ -522,13 +472,13 @@ class TodoSuppliers extends React.Component {
                         {
                             <tr>
                                 <td>
-                                    #
+                                   {this.state.supplierobj[0].index}
                                 </td>
                                 {
-                                    !this.state.supplierobj.edit ? 
-                                    <td className="pt-3-half">
-                                        {this.state.supplierobj.company_Name}
-                                    </td> 
+                                    !this.state.supplierobj[0].edit ? 
+                                        <td className="pt-3-half">
+                                            {this.state.supplierobj[0].company_Name}
+                                        </td> 
                                     :
                                     <td className="pt-3-half" >
                                         {
@@ -537,7 +487,7 @@ class TodoSuppliers extends React.Component {
                                                 type="text" 
                                                 value =  {this.state.currentEditer} 
                                                 className="edited repeatsupp" 
-                                                onChange = {(e) => {this.handleSupplierChangeSingle(e)}}  
+                                                onChange = {(e) => {this.handleSupplierChange(e)}}  
 
                                             />
                                         :
@@ -545,16 +495,16 @@ class TodoSuppliers extends React.Component {
                                                 type="text" 
                                                 value =  {this.state.currentEditer} 
                                                 className="edited" 
-                                                onChange = {(e) => {this.handleSupplierChangeSingle(e)}}  
+                                                onChange = {(e) => {this.handleSupplierChange(e)}}  
                                                 />
                                         }
                                         
                                     </td>
                                 }
                                 {
-                                    !this.state.supplierobj.edit ? 
+                                    !this.state.supplierobj[0].edit ? 
                                     <td>
-                                        <MDBBtn  color="primary" onClick ={(e) => {this.todoEditSingle(this.state.supplierobj.company_Name)}} >
+                                        <MDBBtn  color="primary" onClick ={(e) => {this.todoEdit(this.state.supplierobj[0].company_Name)}} >
                                             <FaEdit className="editicon"/>
                                             Edit</MDBBtn>
                                     </td>
@@ -562,7 +512,7 @@ class TodoSuppliers extends React.Component {
                                     <td>
                                         <MDBBtn 
                                         color="primary" 
-                                        onClick={(e) => {this.todoSaveSingle(e)}}
+                                        onClick={(e) => {this.todoSave(this.state.supplierobj[0].index)}}
                                         >
                                             Save
                                         </MDBBtn>
@@ -574,7 +524,7 @@ class TodoSuppliers extends React.Component {
                                             className = "deletebutton"
                                             color="primary" 
                                             onClick={(e)=>{
-                                                this.todoDelete(this.state.supplierobj.company_Name);
+                                                this.todoDelete(this.state.supplierobj[0].company_Name);
                                             }}
                                         >
                                             <MdDeleteForever className = "deleteicon"/>
@@ -612,7 +562,7 @@ class TodoSuppliers extends React.Component {
                         </table>
                             :
                     
-                        this.state.supplierobject.length > 0 ?
+                        this.state.supplierslist.length > 0 ?
                            <table className="table table-bordered table-responsive-md table-striped text-center">
                                 
                             <thead>
@@ -625,7 +575,7 @@ class TodoSuppliers extends React.Component {
                             </thead>
                             <tbody className = "mainlisthov">
                             { 
-                                this.state.supplierobject.map(item=>{
+                                this.state.supplierslist.map(item=>{
                                    
                                     return (
                                         <tr key={item.company_Name} >
@@ -645,7 +595,7 @@ class TodoSuppliers extends React.Component {
                                                             type="text" 
                                                             value =  {this.state.currentEditer} 
                                                             className="edited repeatsupp" 
-                                                            onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
+                                                            onChange = {(e) => {this.handleSupplierChange(e)}}  
 
                                                         />
                                                    :
@@ -653,7 +603,7 @@ class TodoSuppliers extends React.Component {
                                                             type="text" 
                                                             value =  {this.state.currentEditer} 
                                                             className="edited" 
-                                                            onChange = {(e) => {this.handleSupplierChange(item.index,e)}}  
+                                                            onChange = {(e) => {this.handleSupplierChange(e)}}  
                                                          />
                                                    }
                                                    
@@ -670,7 +620,7 @@ class TodoSuppliers extends React.Component {
                                                 <td>
                                                     <MDBBtn 
                                                     color="primary" 
-                                                    onClick={(e) => {this.todoSave(item.index,e)}}
+                                                    onClick={(e) => {this.todoSave(item.index)}}
                                                     >
                                                         Save
                                                     </MDBBtn>

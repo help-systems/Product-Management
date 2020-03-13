@@ -186,6 +186,7 @@ class TodoCategories extends React.Component {
 
         let categoryobject = this.state.categoryobject;
         let currentEDitCategory;
+        let editCategory;
         categoryobject.map(item => {
           if(item.category_Name === category){
               item.edit = !item.edit;
@@ -199,11 +200,13 @@ class TodoCategories extends React.Component {
         })
         this.setState({
             categoryobject,
+            editCategory:category,
             currentEDitCategory,
             currentCategory:category,
             currentParentCategory:parentCategory
             
         });
+        console.log(this.state.editCategorys)
     }
 
     todoEditSingle= (category,parentCategory) => {

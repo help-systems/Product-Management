@@ -14,7 +14,6 @@ class App extends React.Component {
 			pagelists:[true,false,false,false,false,false],
 			maindata:[],
 			is_showBW:false,
-			showBW:[false,false],
 			base_url:"http://localhost:51560/",
 			mainobject:{
 				Barcode:"",
@@ -53,24 +52,7 @@ class App extends React.Component {
 		})
 	}
 
-	// handlechange_BW = (index) => {
 
-	// 	let showBW = this.state.showBW;
-
-	// 	if(index == 0){
-	// 		showBW[0] = true ;
-	// 		showBW[1] = false;
-	// 	} else {
-	// 		showBW[0] = false;
-	// 		showBW[1] = true;
-	// 	}
-		
-
-
-	// 	this.setState({
-	// 		showBW
-	// 	})
-	// }
 
 	handleMainBarcode = (e) => {
 		let mainobject = this.state.mainobject;
@@ -115,7 +97,6 @@ class App extends React.Component {
 	async MainSearch(){
 
 		let mainobject = this.state.mainobject;
-		console.log(mainobject)
 
 		if(mainobject.BW_Name !==""){
 			if(mainobject.Barcode==="") {mainobject.Barcode="null"}
@@ -174,10 +155,8 @@ class App extends React.Component {
 
 
 	render(){
-		console.log(this.state.showBW)
 
 		let pagelists = this.state.pagelists;
-		// console.log(pagelists[0])
 		return (
 			<div  className="App">
 				<div id="container">

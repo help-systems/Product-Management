@@ -33,7 +33,6 @@ class TodoPIB extends React.Component {
             is_dublicate:false,
             is_edit:false,
             is_fillallinfo:false,
-            // is_repeatBarcode:false,
             is_searchBarcode:false,
             is_wrongBarcode:false,
             
@@ -93,7 +92,6 @@ class TodoPIB extends React.Component {
         url = this.state.base_url + 'Products';
         response = await fetch(url);
         let Barcodes = await response.json();
-        console.log(Barcodes)
 
 
         this.setState({
@@ -103,70 +101,7 @@ class TodoPIB extends React.Component {
         })
     }
 
-    async componentDidUpdate() {
-
-        let mainobject = {
-            BW_Name:"B",
-            Barcode:"null",
-            Product_Name: "null",
-            Category_Name: "null",
-            Supplier_Name: "null",			
-			
-        }
-
-        let url = this.state.base_url + 'Search';
-        let settings = {
-            method: "POST",
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
-                'Access-Control-Allow-Headers': 'origin, content-type, accept, authorization',
-            },
-            body: JSON.stringify(mainobject)
-        };
-        let response = await fetch(url,settings);
-        let productsnewlist = await response.json();
-
-        productsnewlist.map(item => {
-            item.edit = false;
-            item.index = productsnewlist.indexOf(item) + 1;
-            return item;
-        })
-        console.log("dfjghdgjdgh")
-        if(JSON.stringify(productsnewlist) !== JSON.stringify(this.state.productslist)){
-
-            productsnewlist.map(item => {
-                this.state.currentEDitProduct.barcode === item.barcode ?              
-                item.edit = true :
-                 item.edit = false;
-                item.index = productsnewlist.indexOf(item) + 1;
-                return item;
-            })
-            // this.setState({
-            //     productslist:productsnewlist
-            // })
-        }
-        
-        // productslist.map(item => {
-        //     this.state.currentEDitProduct.barcode === item.barcode && this.state.currentEDitProduct.bW_Name === item.bW_Name ?              
-        //         item.edit = true 
-        //         :
-        //         item.edit = false;
-        //     item.index = productslist.indexOf(item) + 1;
-        //     return item;
-        // })
-
-        // // if(this.state.is_searchBarcode){
-        // //     this.state
-
-        // // }
-
-    }
-
+    
     handleInputSearchBarcode = (e) => {
 		this.setState({
             searchBarcode:e.target.value
@@ -229,20 +164,6 @@ class TodoPIB extends React.Component {
             let response = await fetch(url,settings);
             let productobject = await response.json();
             let productslist = this.state.productslist;
-
-            for (let i = 0; i < productslist.length; i++) {
-
-                productobject.map( item => {
-                    console.log(productslist[i].barcode)
-                    if(item.barcode === productslist[i].barcode && item.bW_Name === productslist[i].bW_Name){
-                        console.log(item,"iiiiiffff")
-                        item.index = productslist[i].index;
-                        item.edit = productslist[i].edit;
-                    }
-                    return item;
-                })
-                
-            }
             
             console.log(productobject)
             if(!productobject){
@@ -252,9 +173,11 @@ class TodoPIB extends React.Component {
                     is_wrongBarcode:true
                 });
             }else {
-                // productobject = productobject[0];
-                // productobject.edit = false;
-
+                console.log(this.state.searchBarcode)
+                productobject = productslist.filter(item => {
+                    return item.barcode === this.state.searchBarcode.trim()
+                })
+                console.log(productobject)
                 this.setState({
                     productobject,
                     searchBarcode:"",
@@ -280,6 +203,7 @@ class TodoPIB extends React.Component {
         let response;
         let url;
         let productslist = this.state.productslist;
+        let productobject = this.state.productobject;
 
         if(this.state.is_delete){
             
@@ -303,12 +227,13 @@ class TodoPIB extends React.Component {
 			};
 			
             response = await fetch(url,settings);
-
+            console.log(currentDeleter)
+            productslist = productslist.filter(item => {
+                return item.barcode !== currentDeleter.barcode && item.bW_Name !== currentDeleter.BW_Name
+            })
             this.setState({
                 is_delete:false,
                 is_searchBarcode:false,
-                // category:"",
-                // categoryobj:{},
                 currentDeleter:{
                     barcode:"",
                     BW_Name:""
@@ -342,6 +267,22 @@ class TodoPIB extends React.Component {
 			
             response = await fetch(url,settings);
 
+            
+            if(this.state.is_searchBarcode){
+                productobject = productslist.filter(item =>{
+                    return item.barcode === editableproduct.barcode && item.bW_Name === editableproduct.bW_Name
+                })
+            }else{
+                console.log(editableproduct);
+                productslist.map(item => {
+                    if(item.barcode === editableproduct.barcode && item.bW_Name === editableproduct.BW_Name){
+                        item.count = editableproduct.count;
+                        console.log(item);
+                    }
+                    return item;
+                })
+            }
+
         }else if (this.state.is_add){
 
             let newProduct = {
@@ -349,7 +290,6 @@ class TodoPIB extends React.Component {
                     BW_Name:this.state.selectBranch,
                     Count:Number(this.state.barcodecount)
                 };  
-
             url = this.state.base_url + 'Branches';
             settings = {
                 method: "POST",
@@ -365,7 +305,19 @@ class TodoPIB extends React.Component {
                 body: JSON.stringify (newProduct)
             };                    
             response = await fetch(url,settings);        
-            
+            newProduct = {
+                barcode: this.state.selectBarcode,
+                bW_Name:this.state.selectBranch,
+                count:Number(this.state.barcodecount)
+            }; 
+            newProduct.edit = false;
+            newProduct.index = 0;
+            productslist.unshift(newProduct);
+            productslist.map(item => {
+                item.index++                
+                return item;
+                
+            })
 
             this.setState({
                 addsituation:false,
@@ -373,27 +325,23 @@ class TodoPIB extends React.Component {
                 barcodecount:0
             })
             
-        }      
-        
-        
-        // let categoryobj = this.state.categoryobj;
-
-        // if(this.state.is_searchcategory){
-        //     categoryobj.category_Name = this.state.currentCategory;
-        //     categoryobj.parent_Category= this.state.currentParentCategory;
-
-        // }
+        }
 
         this.setState({
             modal3: !this.state.modal3,
             productslist,
-            // productobject,
+            productobject,
             is_edit:false,
             is_add:false,
             is_dublicate:false,
             barcodecount:0,
             selectBarcode:"",
-            // currentEDitCategory:{category_Name:"",parent_Category:"",index:""}
+            currentEDitProduct:{
+                barcode:"",
+                BW_Name:"",
+                count:"",
+                index:""
+            }
         });
     }
 
@@ -403,18 +351,25 @@ class TodoPIB extends React.Component {
         let productobject = this.state.productobject;
         let currentEDitProduct = this.state.currentEDitProduct;
 
-        // if(productobject) {
-        //     productobject.barcode = currentEDitProduct.barcode;
-        // }
-        
+        if(this.state.is_searchBarcode) {
+            productobject.map(item => {
+                if (item.index === currentEDitProduct.index) {
+                    item.count = currentEDitProduct.count;       
+                    
+                }
+                return item;
+            })
+           
+        }else {
+            productslist.map(item => {
+                if (item.index === currentEDitProduct.index) {
+                    item.count = currentEDitProduct.count;       
+                    
+                }
+                return item;
+            })
 
-        productslist.map(item => {
-            if (item.index === currentEDitProduct.index) {
-                item.count = currentEDitProduct.count;       
-                
-            }
-            return item;
-        })
+        }
         currentEDitProduct = {
                 barcode:"",
                 BW_Name:"",
@@ -537,11 +492,7 @@ class TodoPIB extends React.Component {
                   return item;
             })
         }
-        // console.log(index)
-     
-        // console.log(index)
-        // console.log(currentEDitProduct)
-        
+
         this.setState({
             productobject,
             productslist,
@@ -551,7 +502,6 @@ class TodoPIB extends React.Component {
            
             
         });
-        console.log(currentEDitProduct)
         
     }
 
@@ -626,9 +576,9 @@ class TodoPIB extends React.Component {
                         <div id = "addnewvalues">
                              <div id = "FaMinus">
                                 <span className="table-add float-right mb-3 mr-2">
-                                    <a href="#" className="text-success">
+                                    <p className="text-success">
                                     <FaMinus className = "minus" onClick = {this.minus}/>
-                                    </a>
+                                    </p>
                                 </span>
                             </div>
                             {
@@ -651,9 +601,8 @@ class TodoPIB extends React.Component {
                                         { 
                                            
                                            this.state.Barcodes.map(item => {
-                                                {i++};
                                                 return(
-                                                    <option key = {i} value={item.barcode}>{item.barcode}</option>
+                                                    <option key = {item.barcode} value={item.barcode}>{item.barcode}</option>
                                                 );
                                             })
                                         }
@@ -681,7 +630,6 @@ class TodoPIB extends React.Component {
                                         <option selected disabled>Choose...</option>
                                         { 
                                             this.state.Branches.map(item => {
-                                                {i++};
                                                 return(
                                                     <option key = {item.branch_Name} value={item.branch_Name}>{item.branch_Name}</option>
                                                 );
@@ -711,9 +659,9 @@ class TodoPIB extends React.Component {
                         </div>
                         :
                         <span className="table-add float-right mb-3 mr-2">
-                            <a href="#" className="text-success">
+                            <p className="text-success">
                             <FaPlus onClick = {this.plus}/>
-                            </a>
+                            </p>
                         </span>
                     }
                     <div>
